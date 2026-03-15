@@ -1,16 +1,23 @@
 ## wrapping-grpc-client
 
 Companion code for
-[Wrapping a gRPC client in Go](https://rednafi.com/go/wrapping-grpc-client/).
+[Wrapping a gRPC client in Go](https://rednafi.com/go/wrap-grpc-client/).
 
-### Run the server
+### Install the server
 
 ```sh
-go run ./server/
+go install github.com/rednafi/examples/wrapping-grpc-client/server@latest
 ```
 
-### Run the example client
+### Use the client library
 
 ```sh
+go get github.com/rednafi/examples/wrapping-grpc-client/client@latest
+```
+
+### Run locally
+
+```sh
+go run ./server/ &
 go run ./example/
 ```
