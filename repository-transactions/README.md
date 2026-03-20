@@ -5,6 +5,7 @@ Companion code for
 
 Also see:
 [Do you need a repository layer on top of sqlc?](https://rednafi.com/shards/2026/03/repository-layer-over-sqlc/)
+[Repository pattern & transactions in Go](https://rednafi.com/go/repository-pattern-and-transactions/)
 
 ### Run tests
 
