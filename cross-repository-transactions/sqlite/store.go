@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/book"
 	"github.com/rednafi/examples/cross-repository-transactions/checkout"
-	"github.com/rednafi/examples/cross-repository-transactions/orderstore"
+	"github.com/rednafi/examples/cross-repository-transactions/order"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -16,20 +16,20 @@ type DBTX interface {
 	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
 }
 
-// BookStore implements bookstore.BookStore against SQLite.
+// BookStore implements book.Store against SQLite.
 type BookStore struct{ db DBTX }
 
 func NewBookStore(db DBTX) *BookStore { return &BookStore{db: db} }
 
-func (s *BookStore) Get(ctx context.Context, id int64) (bookstore.Book, error) {
+func (s *BookStore) Get(ctx context.Context, id int64) (book.Book, error) {
 	row := s.db.QueryRowContext(ctx,
 		"SELECT id, title, stock FROM books WHERE id = ?", id)
-	var b bookstore.Book
+	var b book.Book
 	err := row.Scan(&b.ID, &b.Title, &b.Stock)
 	return b, err
 }
 
-func (s *BookStore) Create(ctx context.Context, b bookstore.Book) (int64, error) {
+func (s *BookStore) Create(ctx context.Context, b book.Book) (int64, error) {
 	res, err := s.db.ExecContext(ctx,
 		"INSERT INTO books (title, stock) VALUES (?, ?)", b.Title, b.Stock)
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *BookStore) Create(ctx context.Context, b bookstore.Book) (int64, error)
 	return res.LastInsertId()
 }
 
-func (s *BookStore) CreateAuditLog(ctx context.Context, e bookstore.AuditEntry) error {
+func (s *BookStore) CreateAuditLog(ctx context.Context, e book.AuditEntry) error {
 	_, err := s.db.ExecContext(ctx,
 		"INSERT INTO audit_log (book_id, action) VALUES (?, ?)",
 		e.BookID, e.Action)
@@ -61,12 +61,12 @@ func (s *BookStore) DecrementStock(ctx context.Context, id int64) error {
 	return nil
 }
 
-// OrderStore implements orderstore.OrderStore against SQLite.
+// OrderStore implements order.Store against SQLite.
 type OrderStore struct{ db DBTX }
 
 func NewOrderStore(db DBTX) *OrderStore { return &OrderStore{db: db} }
 
-func (s *OrderStore) Create(ctx context.Context, o orderstore.Order) (int64, error) {
+func (s *OrderStore) Create(ctx context.Context, o order.Order) (int64, error) {
 	res, err := s.db.ExecContext(ctx,
 		"INSERT INTO orders (book_id) VALUES (?)", o.BookID)
 	if err != nil {
@@ -75,10 +75,10 @@ func (s *OrderStore) Create(ctx context.Context, o orderstore.Order) (int64, err
 	return res.LastInsertId()
 }
 
-func (s *OrderStore) Get(ctx context.Context, id int64) (orderstore.Order, error) {
+func (s *OrderStore) Get(ctx context.Context, id int64) (order.Order, error) {
 	row := s.db.QueryRowContext(ctx,
 		"SELECT id, book_id FROM orders WHERE id = ?", id)
-	var o orderstore.Order
+	var o order.Order
 	err := row.Scan(&o.ID, &o.BookID)
 	return o, err
 }

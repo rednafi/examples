@@ -1,4 +1,4 @@
-package bookstore
+package book
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// Compile-time check that memStore satisfies BookStore.
-var _ BookStore = (*memStore)(nil)
+// Compile-time check that memStore satisfies Store.
+var _ Store = (*memStore)(nil)
 
 type memStore struct {
 	mu       sync.Mutex
@@ -47,7 +47,7 @@ func (m *memStore) CreateAuditLog(ctx context.Context, e AuditEntry) error {
 	return nil
 }
 
-func (m *memStore) Tx(ctx context.Context, fn func(BookStore) error) error {
+func (m *memStore) Tx(ctx context.Context, fn func(Store) error) error {
 	return fn(m)
 }
 
@@ -87,7 +87,7 @@ func (f *failingStore) CreateAuditLog(
 }
 
 func (f *failingStore) Tx(
-	ctx context.Context, fn func(BookStore) error) error {
+	ctx context.Context, fn func(Store) error) error {
 	return fn(f)
 }
 

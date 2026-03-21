@@ -1,12 +1,12 @@
-package bookstore
+package book
 
 import "context"
 
 type Service struct {
-	store BookStore
+	store Store
 }
 
-func NewService(s BookStore) *Service {
+func NewService(s Store) *Service {
 	return &Service{store: s}
 }
 
@@ -18,7 +18,7 @@ func (s *Service) GetBook(ctx context.Context, id int64) (Book, error) {
 func (s *Service) RegisterBook(ctx context.Context, title string) (Book, error) {
 	var book Book
 
-	err := s.store.Tx(ctx, func(tx BookStore) error {
+	err := s.store.Tx(ctx, func(tx Store) error {
 		id, err := tx.Create(ctx, Book{Title: title})
 		if err != nil {
 			return err

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/rednafi/examples/repository-transactions/bookstore"
+	"github.com/rednafi/examples/repository-transactions/book"
 )
 
 func setupTestDB(t *testing.T) *sql.DB {
@@ -21,7 +21,7 @@ func setupTestDB(t *testing.T) *sql.DB {
 func TestTx_CommitsOnSuccess(t *testing.T) {
 	db := setupTestDB(t)
 	store := NewStore(db)
-	svc := bookstore.NewService(store)
+	svc := book.NewService(store)
 
 	b, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err != nil {
@@ -56,7 +56,7 @@ func TestTx_RollsBackOnError(t *testing.T) {
 	base := NewStore(db)
 	failing := &failingStore{Store: base}
 
-	svc := bookstore.NewService(failing)
+	svc := book.NewService(failing)
 
 	_, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err == nil {
@@ -78,12 +78,12 @@ type failingStore struct {
 }
 
 func (f *failingStore) CreateAuditLog(
-	ctx context.Context, e bookstore.AuditEntry) error {
+	ctx context.Context, e book.AuditEntry) error {
 	return sql.ErrConnDone
 }
 
 func (f *failingStore) Tx(
-	ctx context.Context, fn func(bookstore.BookStore) error) error {
+	ctx context.Context, fn func(book.Store) error) error {
 	sqlDB, ok := f.db.(*sql.DB)
 	if !ok {
 		return nil

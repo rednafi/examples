@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/rednafi/examples/repository-transactions/bookstore"
+	"github.com/rednafi/examples/repository-transactions/book"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -19,15 +19,15 @@ type Store struct{ db DBTX }
 
 func NewStore(db DBTX) *Store { return &Store{db: db} }
 
-func (s *Store) Get(ctx context.Context, id int64) (bookstore.Book, error) {
+func (s *Store) Get(ctx context.Context, id int64) (book.Book, error) {
 	row := s.db.QueryRowContext(ctx,
 		"SELECT id, title FROM books WHERE id = ?", id)
-	var b bookstore.Book
+	var b book.Book
 	err := row.Scan(&b.ID, &b.Title)
 	return b, err
 }
 
-func (s *Store) Create(ctx context.Context, b bookstore.Book) (int64, error) {
+func (s *Store) Create(ctx context.Context, b book.Book) (int64, error) {
 	res, err := s.db.ExecContext(ctx,
 		"INSERT INTO books (title) VALUES (?)", b.Title)
 	if err != nil {
@@ -36,14 +36,14 @@ func (s *Store) Create(ctx context.Context, b bookstore.Book) (int64, error) {
 	return res.LastInsertId()
 }
 
-func (s *Store) CreateAuditLog(ctx context.Context, e bookstore.AuditEntry) error {
+func (s *Store) CreateAuditLog(ctx context.Context, e book.AuditEntry) error {
 	_, err := s.db.ExecContext(ctx,
 		"INSERT INTO audit_log (book_id, action) VALUES (?, ?)",
 		e.BookID, e.Action)
 	return err
 }
 
-func (s *Store) Tx(ctx context.Context, fn func(bookstore.BookStore) error) error {
+func (s *Store) Tx(ctx context.Context, fn func(book.Store) error) error {
 	sqlDB, ok := s.db.(*sql.DB)
 	if !ok {
 		return errors.New("cannot start tx: already inside a transaction")

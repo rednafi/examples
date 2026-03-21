@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/book"
 	"github.com/rednafi/examples/cross-repository-transactions/checkout"
 	"github.com/rednafi/examples/cross-repository-transactions/sqlite"
 )
 
 func main() {
-	db, err := sqlite.SetupDB("bookstore.db")
+	db, err := sqlite.SetupDB("book.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,14 +36,14 @@ func main() {
 		}
 
 		id, err := stores.Books.Create(r.Context(),
-			bookstore.Book{Title: req.Title, Stock: req.Stock})
+			book.Book{Title: req.Title, Stock: req.Stock})
 		if err != nil {
 			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(bookstore.Book{ID: id, Title: req.Title, Stock: req.Stock})
+		json.NewEncoder(w).Encode(book.Book{ID: id, Title: req.Title, Stock: req.Stock})
 	})
 
 	http.HandleFunc("GET /books/{id}", func(w http.ResponseWriter, r *http.Request) {

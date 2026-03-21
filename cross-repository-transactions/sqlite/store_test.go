@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/rednafi/examples/cross-repository-transactions/checkout"
-	"github.com/rednafi/examples/cross-repository-transactions/orderstore"
+	"github.com/rednafi/examples/cross-repository-transactions/order"
 )
 
 func setupTestDB(t *testing.T) *sql.DB {
@@ -132,11 +132,11 @@ func (u *failingOrderUoW) RunInTx(
 type failingOrderStore struct{}
 
 func (f *failingOrderStore) Create(
-	_ context.Context, _ orderstore.Order) (int64, error) {
+	_ context.Context, _ order.Order) (int64, error) {
 	return 0, sql.ErrConnDone
 }
 
 func (f *failingOrderStore) Get(
-	_ context.Context, _ int64) (orderstore.Order, error) {
-	return orderstore.Order{}, sql.ErrConnDone
+	_ context.Context, _ int64) (order.Order, error) {
+	return order.Order{}, sql.ErrConnDone
 }

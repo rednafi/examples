@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rednafi/examples/repository-transactions/bookstore"
+	"github.com/rednafi/examples/repository-transactions/book"
 	"github.com/rednafi/examples/repository-transactions/sqlite"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	defer db.Close()
 
 	store := sqlite.NewStore(db)
-	svc := bookstore.NewService(store)
+	svc := book.NewService(store)
 
 	http.HandleFunc("POST /books", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
