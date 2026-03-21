@@ -55,7 +55,7 @@ func TestRegisterBook(t *testing.T) {
 	store := newMemStore()
 	svc := NewService(store)
 
-	b, err := svc.RegisterBook(context.Background(), "DDIA")
+	b, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestRegisterBook_AuditFails(t *testing.T) {
 	store := &failingStore{memStore: inner}
 	svc := NewService(store)
 
-	_, err := svc.RegisterBook(context.Background(), "DDIA")
+	_, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err == nil {
 		t.Fatal("expected error when audit log fails")
 	}

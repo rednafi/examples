@@ -102,7 +102,7 @@ func TestPlaceOrder(t *testing.T) {
 	stores := Stores{Books: books, Orders: orders}
 	svc := NewService(stores, &memUoW{stores: stores})
 
-	order, err := svc.PlaceOrder(context.Background(), 1)
+	order, err := svc.PlaceOrder(t.Context(), 1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func TestPlaceOrder_OutOfStock(t *testing.T) {
 	stores := Stores{Books: books, Orders: orders}
 	svc := NewService(stores, &memUoW{stores: stores})
 
-	_, err := svc.PlaceOrder(context.Background(), 1)
+	_, err := svc.PlaceOrder(t.Context(), 1)
 	if err == nil {
 		t.Fatal("expected error for out-of-stock book")
 	}

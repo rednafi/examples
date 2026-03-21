@@ -43,7 +43,7 @@ func TestRunInTx_CommitsOnSuccess(t *testing.T) {
 	uow := NewUoW(db)
 	svc := bookstore.NewService(stores, uow)
 
-	order, err := svc.PlaceOrder(context.Background(), bookID)
+	order, err := svc.PlaceOrder(t.Context(), bookID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestRunInTx_RollsBackOnError(t *testing.T) {
 	failUoW := &failingOrderUoW{db: db}
 	svc := bookstore.NewService(stores, failUoW)
 
-	_, err := svc.PlaceOrder(context.Background(), bookID)
+	_, err := svc.PlaceOrder(t.Context(), bookID)
 	if err == nil {
 		t.Fatal("expected error")
 	}

@@ -23,7 +23,7 @@ func TestTx_CommitsOnSuccess(t *testing.T) {
 	store := NewStore(db)
 	svc := bookstore.NewService(store)
 
-	b, err := svc.RegisterBook(context.Background(), "DDIA")
+	b, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestTx_CommitsOnSuccess(t *testing.T) {
 		t.Fatal("expected non-zero ID")
 	}
 
-	got, err := store.Get(context.Background(), b.ID)
+	got, err := store.Get(t.Context(), b.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestTx_RollsBackOnError(t *testing.T) {
 
 	svc := bookstore.NewService(failing)
 
-	_, err := svc.RegisterBook(context.Background(), "DDIA")
+	_, err := svc.RegisterBook(t.Context(), "DDIA")
 	if err == nil {
 		t.Fatal("expected error")
 	}
