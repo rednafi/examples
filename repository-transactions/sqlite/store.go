@@ -15,11 +15,11 @@ type DBTX interface {
 	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
 }
 
-type Store struct{ db DBTX }
+type BookStore struct{ db DBTX }
 
-func NewStore(db DBTX) *Store { return &Store{db: db} }
+func NewBookStore(db DBTX) *BookStore { return &BookStore{db: db} }
 
-func (s *Store) Get(ctx context.Context, id int64) (book.Book, error) {
+func (s *BookStore) Get(ctx context.Context, id int64) (book.Book, error) {
 	row := s.db.QueryRowContext(ctx,
 		"SELECT id, title FROM books WHERE id = ?", id)
 	var b book.Book
@@ -27,7 +27,7 @@ func (s *Store) Get(ctx context.Context, id int64) (book.Book, error) {
 	return b, err
 }
 
-func (s *Store) Create(ctx context.Context, b book.Book) (int64, error) {
+func (s *BookStore) Create(ctx context.Context, b book.Book) (int64, error) {
 	res, err := s.db.ExecContext(ctx,
 		"INSERT INTO books (title) VALUES (?)", b.Title)
 	if err != nil {
@@ -36,14 +36,14 @@ func (s *Store) Create(ctx context.Context, b book.Book) (int64, error) {
 	return res.LastInsertId()
 }
 
-func (s *Store) CreateAuditLog(ctx context.Context, e book.AuditEntry) error {
+func (s *BookStore) CreateAuditLog(ctx context.Context, e book.AuditEntry) error {
 	_, err := s.db.ExecContext(ctx,
 		"INSERT INTO audit_log (book_id, action) VALUES (?, ?)",
 		e.BookID, e.Action)
 	return err
 }
 
-func (s *Store) Tx(ctx context.Context, fn func(book.Store) error) error {
+func (s *BookStore) Tx(ctx context.Context, fn func(book.Store) error) error {
 	sqlDB, ok := s.db.(*sql.DB)
 	if !ok {
 		return errors.New("cannot start tx: already inside a transaction")
@@ -54,7 +54,7 @@ func (s *Store) Tx(ctx context.Context, fn func(book.Store) error) error {
 		return err
 	}
 
-	if err := fn(NewStore(tx)); err != nil {
+	if err := fn(NewBookStore(tx)); err != nil {
 		_ = tx.Rollback()
 		return err
 	}

@@ -17,7 +17,7 @@ func main() {
 	}
 	defer db.Close()
 
-	store := sqlite.NewStore(db)
+	store := sqlite.NewBookStore(db)
 	svc := book.NewService(store)
 
 	http.HandleFunc("POST /books", func(w http.ResponseWriter, r *http.Request) {

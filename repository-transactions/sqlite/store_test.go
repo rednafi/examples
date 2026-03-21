@@ -20,7 +20,7 @@ func setupTestDB(t *testing.T) *sql.DB {
 
 func TestTx_CommitsOnSuccess(t *testing.T) {
 	db := setupTestDB(t)
-	store := NewStore(db)
+	store := NewBookStore(db)
 	svc := book.NewService(store)
 
 	b, err := svc.RegisterBook(t.Context(), "DDIA")
@@ -53,8 +53,8 @@ func TestTx_CommitsOnSuccess(t *testing.T) {
 func TestTx_RollsBackOnError(t *testing.T) {
 	db := setupTestDB(t)
 
-	base := NewStore(db)
-	failing := &failingStore{Store: base}
+	base := NewBookStore(db)
+	failing := &failingStore{BookStore: base}
 
 	svc := book.NewService(failing)
 
@@ -74,7 +74,7 @@ func TestTx_RollsBackOnError(t *testing.T) {
 }
 
 type failingStore struct {
-	*Store
+	*BookStore
 }
 
 func (f *failingStore) CreateAuditLog(
@@ -92,7 +92,7 @@ func (f *failingStore) Tx(
 	if err != nil {
 		return err
 	}
-	txStore := &failingStore{Store: NewStore(tx)}
+	txStore := &failingStore{BookStore: NewBookStore(tx)}
 	if err := fn(txStore); err != nil {
 		_ = tx.Rollback()
 		return err
