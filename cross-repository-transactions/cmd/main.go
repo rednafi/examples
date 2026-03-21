@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/checkout"
 	"github.com/rednafi/examples/cross-repository-transactions/sqlite"
 )
 
@@ -17,12 +18,12 @@ func main() {
 	}
 	defer db.Close()
 
-	stores := bookstore.Stores{
+	stores := checkout.Stores{
 		Books:  sqlite.NewBookStore(db),
 		Orders: sqlite.NewOrderStore(db),
 	}
 	uow := sqlite.NewUoW(db)
-	svc := bookstore.NewService(stores, uow)
+	svc := checkout.NewService(stores, uow)
 
 	http.HandleFunc("POST /books", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {

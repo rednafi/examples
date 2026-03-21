@@ -5,7 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/checkout"
+	"github.com/rednafi/examples/cross-repository-transactions/orderstore"
 )
 
 func setupTestDB(t *testing.T) *sql.DB {
@@ -36,12 +37,12 @@ func TestRunInTx_CommitsOnSuccess(t *testing.T) {
 	db := setupTestDB(t)
 	bookID := seedBook(t, db, "DDIA", 5)
 
-	stores := bookstore.Stores{
+	stores := checkout.Stores{
 		Books:  NewBookStore(db),
 		Orders: NewOrderStore(db),
 	}
 	uow := NewUoW(db)
-	svc := bookstore.NewService(stores, uow)
+	svc := checkout.NewService(stores, uow)
 
 	order, err := svc.PlaceOrder(t.Context(), bookID)
 	if err != nil {
@@ -51,7 +52,6 @@ func TestRunInTx_CommitsOnSuccess(t *testing.T) {
 		t.Fatalf("order book ID = %d, want %d", order.BookID, bookID)
 	}
 
-	// Verify stock was decremented.
 	var stock int
 	err = db.QueryRow("SELECT stock FROM books WHERE id = ?", bookID).Scan(&stock)
 	if err != nil {
@@ -61,7 +61,6 @@ func TestRunInTx_CommitsOnSuccess(t *testing.T) {
 		t.Fatalf("stock = %d, want 4", stock)
 	}
 
-	// Verify order was created.
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM orders WHERE book_id = ?",
 		bookID).Scan(&count)
@@ -77,21 +76,18 @@ func TestRunInTx_RollsBackOnError(t *testing.T) {
 	db := setupTestDB(t)
 	bookID := seedBook(t, db, "DDIA", 5)
 
-	// Use a failing order store so the transaction rolls back after
-	// the stock decrement but before the order insert commits.
-	stores := bookstore.Stores{
+	stores := checkout.Stores{
 		Books:  NewBookStore(db),
 		Orders: NewOrderStore(db),
 	}
 	failUoW := &failingOrderUoW{db: db}
-	svc := bookstore.NewService(stores, failUoW)
+	svc := checkout.NewService(stores, failUoW)
 
 	_, err := svc.PlaceOrder(t.Context(), bookID)
 	if err == nil {
 		t.Fatal("expected error")
 	}
 
-	// Stock should be unchanged because the transaction rolled back.
 	var stock int
 	err = db.QueryRow("SELECT stock FROM books WHERE id = ?", bookID).Scan(&stock)
 	if err != nil {
@@ -101,7 +97,6 @@ func TestRunInTx_RollsBackOnError(t *testing.T) {
 		t.Fatalf("stock = %d, want 5 (rollback should have restored it)", stock)
 	}
 
-	// No orders should exist.
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM orders").Scan(&count)
 	if err != nil {
@@ -112,18 +107,17 @@ func TestRunInTx_RollsBackOnError(t *testing.T) {
 	}
 }
 
-// failingOrderUoW is a UnitOfWork whose OrderStore always fails on Create.
 type failingOrderUoW struct{ db *sql.DB }
 
 func (u *failingOrderUoW) RunInTx(
-	ctx context.Context, fn func(bookstore.Stores) error) error {
+	ctx context.Context, fn func(checkout.Stores) error) error {
 
 	tx, err := u.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	stores := bookstore.Stores{
+	stores := checkout.Stores{
 		Books:  NewBookStore(tx),
 		Orders: &failingOrderStore{},
 	}
@@ -138,11 +132,11 @@ func (u *failingOrderUoW) RunInTx(
 type failingOrderStore struct{}
 
 func (f *failingOrderStore) Create(
-	_ context.Context, _ bookstore.Order) (int64, error) {
+	_ context.Context, _ orderstore.Order) (int64, error) {
 	return 0, sql.ErrConnDone
 }
 
 func (f *failingOrderStore) Get(
-	_ context.Context, _ int64) (bookstore.Order, error) {
-	return bookstore.Order{}, sql.ErrConnDone
+	_ context.Context, _ int64) (orderstore.Order, error) {
+	return orderstore.Order{}, sql.ErrConnDone
 }

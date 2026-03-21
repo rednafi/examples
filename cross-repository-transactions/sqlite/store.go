@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/checkout"
+	"github.com/rednafi/examples/cross-repository-transactions/orderstore"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -36,6 +38,13 @@ func (s *BookStore) Create(ctx context.Context, b bookstore.Book) (int64, error)
 	return res.LastInsertId()
 }
 
+func (s *BookStore) CreateAuditLog(ctx context.Context, e bookstore.AuditEntry) error {
+	_, err := s.db.ExecContext(ctx,
+		"INSERT INTO audit_log (book_id, action) VALUES (?, ?)",
+		e.BookID, e.Action)
+	return err
+}
+
 func (s *BookStore) DecrementStock(ctx context.Context, id int64) error {
 	res, err := s.db.ExecContext(ctx,
 		"UPDATE books SET stock = stock - 1 WHERE id = ? AND stock > 0", id)
@@ -52,12 +61,12 @@ func (s *BookStore) DecrementStock(ctx context.Context, id int64) error {
 	return nil
 }
 
-// OrderStore implements bookstore.OrderStore against SQLite.
+// OrderStore implements orderstore.OrderStore against SQLite.
 type OrderStore struct{ db DBTX }
 
 func NewOrderStore(db DBTX) *OrderStore { return &OrderStore{db: db} }
 
-func (s *OrderStore) Create(ctx context.Context, o bookstore.Order) (int64, error) {
+func (s *OrderStore) Create(ctx context.Context, o orderstore.Order) (int64, error) {
 	res, err := s.db.ExecContext(ctx,
 		"INSERT INTO orders (book_id) VALUES (?)", o.BookID)
 	if err != nil {
@@ -66,26 +75,26 @@ func (s *OrderStore) Create(ctx context.Context, o bookstore.Order) (int64, erro
 	return res.LastInsertId()
 }
 
-func (s *OrderStore) Get(ctx context.Context, id int64) (bookstore.Order, error) {
+func (s *OrderStore) Get(ctx context.Context, id int64) (orderstore.Order, error) {
 	row := s.db.QueryRowContext(ctx,
 		"SELECT id, book_id FROM orders WHERE id = ?", id)
-	var o bookstore.Order
+	var o orderstore.Order
 	err := row.Scan(&o.ID, &o.BookID)
 	return o, err
 }
 
-// UoW implements bookstore.UnitOfWork using a real SQL transaction.
+// UoW implements checkout.UnitOfWork using a real SQL transaction.
 type UoW struct{ db *sql.DB }
 
 func NewUoW(db *sql.DB) *UoW { return &UoW{db: db} }
 
-func (u *UoW) RunInTx(ctx context.Context, fn func(bookstore.Stores) error) error {
+func (u *UoW) RunInTx(ctx context.Context, fn func(checkout.Stores) error) error {
 	tx, err := u.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	stores := bookstore.Stores{
+	stores := checkout.Stores{
 		Books:  NewBookStore(tx),
 		Orders: NewOrderStore(tx),
 	}
@@ -107,6 +116,11 @@ func SetupDB(path string) (*sql.DB, error) {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			title TEXT NOT NULL,
 			stock INTEGER NOT NULL DEFAULT 0
+		);
+		CREATE TABLE IF NOT EXISTS audit_log (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			book_id INTEGER NOT NULL,
+			action TEXT NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS orders (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,

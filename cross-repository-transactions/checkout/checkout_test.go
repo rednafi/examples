@@ -1,43 +1,50 @@
-package bookstore
+package checkout
 
 import (
 	"context"
 	"fmt"
 	"sync"
 	"testing"
+
+	"github.com/rednafi/examples/cross-repository-transactions/bookstore"
+	"github.com/rednafi/examples/cross-repository-transactions/orderstore"
 )
 
-var _ BookStore = (*memBookStore)(nil)
-var _ OrderStore = (*memOrderStore)(nil)
+var _ bookstore.BookStore = (*memBookStore)(nil)
+var _ orderstore.OrderStore = (*memOrderStore)(nil)
 var _ UnitOfWork = (*memUoW)(nil)
 
 type memBookStore struct {
 	mu    sync.Mutex
-	books map[int64]Book
+	books map[int64]bookstore.Book
 	next  int64
 }
 
 func newMemBookStore() *memBookStore {
-	return &memBookStore{books: make(map[int64]Book)}
+	return &memBookStore{books: make(map[int64]bookstore.Book)}
 }
 
-func (m *memBookStore) Get(_ context.Context, id int64) (Book, error) {
+func (m *memBookStore) Get(_ context.Context, id int64) (bookstore.Book, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	b, ok := m.books[id]
 	if !ok {
-		return Book{}, fmt.Errorf("book %d not found", id)
+		return bookstore.Book{}, fmt.Errorf("book %d not found", id)
 	}
 	return b, nil
 }
 
-func (m *memBookStore) Create(_ context.Context, b Book) (int64, error) {
+func (m *memBookStore) Create(_ context.Context, b bookstore.Book) (int64, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.next++
 	b.ID = m.next
 	m.books[b.ID] = b
 	return b.ID, nil
+}
+
+func (m *memBookStore) CreateAuditLog(_ context.Context, _ bookstore.AuditEntry) error {
+	return nil
 }
 
 func (m *memBookStore) DecrementStock(_ context.Context, id int64) error {
@@ -57,15 +64,15 @@ func (m *memBookStore) DecrementStock(_ context.Context, id int64) error {
 
 type memOrderStore struct {
 	mu     sync.Mutex
-	orders map[int64]Order
+	orders map[int64]orderstore.Order
 	next   int64
 }
 
 func newMemOrderStore() *memOrderStore {
-	return &memOrderStore{orders: make(map[int64]Order)}
+	return &memOrderStore{orders: make(map[int64]orderstore.Order)}
 }
 
-func (m *memOrderStore) Create(_ context.Context, o Order) (int64, error) {
+func (m *memOrderStore) Create(_ context.Context, o orderstore.Order) (int64, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.next++
@@ -74,12 +81,12 @@ func (m *memOrderStore) Create(_ context.Context, o Order) (int64, error) {
 	return o.ID, nil
 }
 
-func (m *memOrderStore) Get(_ context.Context, id int64) (Order, error) {
+func (m *memOrderStore) Get(_ context.Context, id int64) (orderstore.Order, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	o, ok := m.orders[id]
 	if !ok {
-		return Order{}, fmt.Errorf("order %d not found", id)
+		return orderstore.Order{}, fmt.Errorf("order %d not found", id)
 	}
 	return o, nil
 }
@@ -96,8 +103,7 @@ func TestPlaceOrder(t *testing.T) {
 	books := newMemBookStore()
 	orders := newMemOrderStore()
 
-	// Seed a book with stock.
-	books.books[1] = Book{ID: 1, Title: "DDIA", Stock: 5}
+	books.books[1] = bookstore.Book{ID: 1, Title: "DDIA", Stock: 5}
 
 	stores := Stores{Books: books, Orders: orders}
 	svc := NewService(stores, &memUoW{stores: stores})
@@ -122,7 +128,7 @@ func TestPlaceOrder_OutOfStock(t *testing.T) {
 	books := newMemBookStore()
 	orders := newMemOrderStore()
 
-	books.books[1] = Book{ID: 1, Title: "DDIA", Stock: 0}
+	books.books[1] = bookstore.Book{ID: 1, Title: "DDIA", Stock: 0}
 
 	stores := Stores{Books: books, Orders: orders}
 	svc := NewService(stores, &memUoW{stores: stores})
