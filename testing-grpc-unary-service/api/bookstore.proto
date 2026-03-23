@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package bookpb;
+
+option go_package = "github.com/rednafi/examples/testing-grpc-unary-service/api";
+
+service Bookstore {
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+}
+
+message CreateBookRequest {
+  string title = 1;
+  string author = 2;
+}
+
+message CreateBookResponse {
+  int64 id = 1;
+}
+
+message GetBookRequest {
+  int64 id = 1;
+}
+
+message GetBookResponse {
+  int64 id = 1;
+  string title = 2;
+  string author = 3;
+}
