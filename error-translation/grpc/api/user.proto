@@ -1,6 +1,6 @@
 syntax = "proto3";
 package userpb;
-option go_package = "github.com/rednafi/examples/error-translation-grpc/api";
+option go_package = "github.com/rednafi/examples/error-translation/grpc/api";
 
 service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
