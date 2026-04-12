@@ -46,8 +46,7 @@ func (s *UserStore) Create(
 		u.Name, u.Email,
 	)
 	if err != nil {
-		var sqliteErr sqlite3.Error
-		if errors.As(err, &sqliteErr) &&
+		if sqliteErr, ok := errors.AsType[sqlite3.Error](err); ok &&
 			sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return 0, fmt.Errorf(
 				"user %s already exists: %w", u.Email, user.ErrConflict,
