@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/rednafi/examples/error-translation-grpc/api"
-	"github.com/rednafi/examples/error-translation-grpc/sqlite"
-	"github.com/rednafi/examples/error-translation-grpc/user"
+	"github.com/rednafi/examples/error-translation/grpc/api"
+	"github.com/rednafi/examples/error-translation/grpc/sqlite"
+	"github.com/rednafi/examples/error-translation/grpc/user"
 )
 
 type handler struct {

@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/mattn/go-sqlite3"
-	"github.com/rednafi/examples/error-translation-http/user"
+	"github.com/rednafi/examples/error-translation/http/user"
 )
 
 type UserStore struct {

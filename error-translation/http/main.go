@@ -11,8 +11,8 @@ import (
 	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/rednafi/examples/error-translation-http/sqlite"
-	"github.com/rednafi/examples/error-translation-http/user"
+	"github.com/rednafi/examples/error-translation/http/sqlite"
+	"github.com/rednafi/examples/error-translation/http/user"
 )
 
 func main() {
