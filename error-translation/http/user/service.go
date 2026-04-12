@@ -19,7 +19,9 @@ func (s *Service) GetUser(ctx context.Context, id int64) (User, error) {
 		return User{}, err
 	}
 	if u.DeletedAt != nil {
-		return User{}, fmt.Errorf("user %d soft-deleted: %w", id, ErrNotFound)
+		return User{}, fmt.Errorf(
+			"user %d soft-deleted: %w", id, ErrNotFound,
+		)
 	}
 	return u, nil
 }
