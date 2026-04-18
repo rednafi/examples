@@ -101,7 +101,7 @@ func emitValidate(buf *bytes.Buffer, name string, st *ast.StructType) bool {
 		if tag == "" {
 			continue
 		}
-		for _, r := range strings.Split(tag, ",") {
+		for r := range strings.SplitSeq(tag, ",") {
 			head, arg, _ := strings.Cut(r, "=")
 			checks = append(checks, check{f.Names[0].Name, head, arg})
 		}

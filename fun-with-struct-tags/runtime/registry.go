@@ -35,9 +35,9 @@ func Validate(s any) error {
 	v := reflect.ValueOf(s).Elem()
 	t := v.Type()
 
-	for i := 0; i < t.NumField(); i++ {
+	for i := range t.NumField() {
 		tag := t.Field(i).Tag.Get("check")
-		for _, rule := range strings.Split(tag, ",") {
+		for rule := range strings.SplitSeq(tag, ",") {
 			head, arg, _ := strings.Cut(rule, "=")
 			fn, ok := rules[head]
 			if !ok {
