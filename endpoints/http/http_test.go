@@ -2,18 +2,18 @@ package http_test
 
 import (
 	"encoding/json"
-	nethttp "net/http"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/rednafi/examples/endpoints/greet"
-	apphttp "github.com/rednafi/examples/endpoints/http"
+	ehttp "github.com/rednafi/examples/endpoints/http"
 )
 
-func newMux() *nethttp.ServeMux {
-	mux := nethttp.NewServeMux()
-	apphttp.Register(mux, greet.NewService())
+func newMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	ehttp.Register(mux, greet.NewService())
 	return mux
 }
 
@@ -54,7 +54,7 @@ func TestSubscribe(t *testing.T) {
 	first := httptest.NewRequest("POST", "/subscribe", strings.NewReader(`{"email":"a@b.com","formality":0}`))
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, first)
-	if rec.Code != nethttp.StatusCreated {
+	if rec.Code != http.StatusCreated {
 		t.Fatalf("status = %d, body = %s", rec.Code, rec.Body.String())
 	}
 	var got struct{ ID string }
@@ -68,14 +68,14 @@ func TestSubscribe(t *testing.T) {
 	dup := httptest.NewRequest("POST", "/subscribe", strings.NewReader(`{"email":"a@b.com","formality":0}`))
 	rec = httptest.NewRecorder()
 	mux.ServeHTTP(rec, dup)
-	if rec.Code != nethttp.StatusConflict {
+	if rec.Code != http.StatusConflict {
 		t.Fatalf("dup status = %d", rec.Code)
 	}
 
 	bad := httptest.NewRequest("POST", "/subscribe", strings.NewReader(`{"email":"no-at","formality":0}`))
 	rec = httptest.NewRecorder()
 	mux.ServeHTTP(rec, bad)
-	if rec.Code != nethttp.StatusBadRequest {
+	if rec.Code != http.StatusBadRequest {
 		t.Fatalf("invalid status = %d", rec.Code)
 	}
 }

@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net"
-	nethttp "net/http"
+	"net/http"
 	"os"
 
-	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 
 	"github.com/rednafi/examples/endpoints/greet"
-	apphttp "github.com/rednafi/examples/endpoints/http"
-	appgrpc "github.com/rednafi/examples/endpoints/grpc"
+	egrpc "github.com/rednafi/examples/endpoints/grpc"
+	ehttp "github.com/rednafi/examples/endpoints/http"
 )
 
 func main() {
@@ -25,13 +25,13 @@ func main() {
 
 	switch mode {
 	case "http":
-		mux := nethttp.NewServeMux()
-		apphttp.Register(mux, svc)
+		mux := http.NewServeMux()
+		ehttp.Register(mux, svc)
 		fmt.Println("http listening on :8080")
-		log.Fatal(nethttp.ListenAndServe(":8080", mux))
+		log.Fatal(http.ListenAndServe(":8080", mux))
 	case "grpc":
-		srv := ggrpc.NewServer()
-		appgrpc.Register(srv, svc)
+		srv := grpc.NewServer()
+		egrpc.Register(srv, svc)
 		lis, err := net.Listen("tcp", ":9090")
 		if err != nil {
 			log.Fatal(err)

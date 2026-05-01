@@ -6,15 +6,16 @@
 //  3. Server, which satisfies the generated greeterpb.GreeterServer interface.
 //  4. Error mapping from greet error codes to gRPC status codes.
 //
-// Importers must alias this package because it shadows google.golang.org/grpc;
-// see cmd/server.
+// Package name grpc shadows google.golang.org/grpc for outside importers;
+// alias this package as egrpc at the call site and leave google.golang.org/grpc
+// plain.
 package grpc
 
 import (
 	"context"
 	"errors"
 
-	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -101,7 +102,7 @@ func (s *Server) Subscribe(ctx context.Context, req *pb.SubscribeRequest) (*pb.S
 }
 
 // Register attaches the Greeter server to a gRPC server.
-func Register(srv *ggrpc.Server, svc *greet.Service) {
+func Register(srv *grpc.Server, svc *greet.Service) {
 	pb.RegisterGreeterServer(srv, NewServer(svc))
 }
 

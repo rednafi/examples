@@ -9,12 +9,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/rednafi/examples/endpoints/greet"
-	appgrpc "github.com/rednafi/examples/endpoints/grpc"
+	egrpc "github.com/rednafi/examples/endpoints/grpc"
 	pb "github.com/rednafi/examples/endpoints/grpc/api"
 )
 
 func TestGreet(t *testing.T) {
-	srv := appgrpc.NewServer(greet.NewService())
+	srv := egrpc.NewServer(greet.NewService())
 	ctx := context.Background()
 
 	out, err := srv.Greet(ctx, &pb.GreetRequest{Name: "red", Formality: 1})
@@ -39,7 +39,7 @@ func TestGreet(t *testing.T) {
 }
 
 func TestSubscribe(t *testing.T) {
-	srv := appgrpc.NewServer(greet.NewService())
+	srv := egrpc.NewServer(greet.NewService())
 	ctx := context.Background()
 
 	out, err := srv.Subscribe(ctx, &pb.SubscribeRequest{Email: "a@b.com", Formality: 0})

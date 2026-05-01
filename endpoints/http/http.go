@@ -6,7 +6,8 @@
 //  3. Register, which mounts every endpoint onto an *http.ServeMux.
 //  4. Error mapping from greet error codes to HTTP statuses.
 //
-// Importers must alias this package because it shadows net/http; see cmd/server.
+// Package name http shadows net/http for outside importers; alias this
+// package as ehttp at the call site and leave net/http plain.
 package http
 
 import (
@@ -14,7 +15,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	nethttp "net/http"
+	"net/http"
 
 	"github.com/rednafi/examples/endpoints/greet"
 )
@@ -24,11 +25,11 @@ type validator interface{ Validate() error }
 // Wrap turns a domain function into an HTTP handler. The decode and encode
 // callbacks are the only place HTTP-specific types appear at the call site.
 func Wrap[In, Out any](
-	decode func(*nethttp.Request) (In, error),
+	decode func(*http.Request) (In, error),
 	fn func(context.Context, In) (Out, error),
-	encode func(nethttp.ResponseWriter, Out) error,
-) nethttp.Handler {
-	return nethttp.HandlerFunc(func(w nethttp.ResponseWriter, r *nethttp.Request) {
+	encode func(http.ResponseWriter, Out) error,
+) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		in, err := decode(r)
 		if err != nil {
 			writeErr(w, err)
@@ -54,7 +55,7 @@ func Wrap[In, Out any](
 	})
 }
 
-func decodeGreet(r *nethttp.Request) (greet.GreetIn, error) {
+func decodeGreet(r *http.Request) (greet.GreetIn, error) {
 	var body struct {
 		Name      string `json:"name"`
 		Formality int    `json:"formality"`
@@ -65,15 +66,15 @@ func decodeGreet(r *nethttp.Request) (greet.GreetIn, error) {
 	return greet.GreetIn{Name: body.Name, Formality: body.Formality}, nil
 }
 
-func encodeGreet(w nethttp.ResponseWriter, out greet.GreetOut) error {
+func encodeGreet(w http.ResponseWriter, out greet.GreetOut) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(nethttp.StatusOK)
+	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(struct {
 		Message string `json:"message"`
 	}{out.Message})
 }
 
-func decodeSubscribe(r *nethttp.Request) (greet.SubscribeIn, error) {
+func decodeSubscribe(r *http.Request) (greet.SubscribeIn, error) {
 	var body struct {
 		Email     string `json:"email"`
 		Formality int    `json:"formality"`
@@ -84,21 +85,21 @@ func decodeSubscribe(r *nethttp.Request) (greet.SubscribeIn, error) {
 	return greet.SubscribeIn{Email: body.Email, Formality: body.Formality}, nil
 }
 
-func encodeSubscribe(w nethttp.ResponseWriter, out greet.SubscribeOut) error {
+func encodeSubscribe(w http.ResponseWriter, out greet.SubscribeOut) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(nethttp.StatusCreated)
+	w.WriteHeader(http.StatusCreated)
 	return json.NewEncoder(w).Encode(struct {
 		ID string `json:"id"`
 	}{out.ID})
 }
 
 // Register mounts every greet endpoint on mux.
-func Register(mux *nethttp.ServeMux, svc *greet.Service) {
+func Register(mux *http.ServeMux, svc *greet.Service) {
 	mux.Handle("POST /greet", Wrap(decodeGreet, svc.Greet, encodeGreet))
 	mux.Handle("POST /subscribe", Wrap(decodeSubscribe, svc.Subscribe, encodeSubscribe))
 }
 
-func writeErr(w nethttp.ResponseWriter, err error) {
+func writeErr(w http.ResponseWriter, err error) {
 	var de *greet.Error
 	if !errors.As(err, &de) {
 		de = greet.Internal(err)
@@ -111,16 +112,16 @@ func writeErr(w nethttp.ResponseWriter, err error) {
 func statusFor(c greet.Code) int {
 	switch c {
 	case greet.CodeInvalidArgument:
-		return nethttp.StatusBadRequest
+		return http.StatusBadRequest
 	case greet.CodeUnauthenticated:
-		return nethttp.StatusUnauthorized
+		return http.StatusUnauthorized
 	case greet.CodePermissionDenied:
-		return nethttp.StatusForbidden
+		return http.StatusForbidden
 	case greet.CodeNotFound:
-		return nethttp.StatusNotFound
+		return http.StatusNotFound
 	case greet.CodeAlreadyExists:
-		return nethttp.StatusConflict
+		return http.StatusConflict
 	default:
-		return nethttp.StatusInternalServerError
+		return http.StatusInternalServerError
 	}
 }
