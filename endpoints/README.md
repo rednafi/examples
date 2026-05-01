@@ -15,7 +15,9 @@ endpoints/
 ├── http/                 # HTTP wiring (package http, alias on import)
 ├── grpc/                 # gRPC wiring (package grpc, alias on import)
 │   └── api/              # generated protobuf
-└── cmd/server/           # main, wires it together
+└── cmd/
+    ├── http/             # HTTP server binary
+    └── grpc/             # gRPC server binary
 ```
 
 ### Run tests
@@ -27,6 +29,6 @@ go test ./...
 ### Run servers
 
 ```sh
-go run ./cmd/server http   # POST http://localhost:8080/greet
-go run ./cmd/server grpc   # greeterpb.Greeter on :9090
+go run ./cmd/http   # POST http://localhost:8080/greet
+go run ./cmd/grpc   # greeterpb.Greeter on :9090
 ```

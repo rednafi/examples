@@ -9,7 +9,7 @@ test:
 	go test ./...
 
 run-http:
-	go run ./cmd/server http
+	go run ./cmd/http
 
 run-grpc:
-	go run ./cmd/server grpc
+	go run ./cmd/grpc
