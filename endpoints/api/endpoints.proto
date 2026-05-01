@@ -1,0 +1,14 @@
+syntax = "proto3";
+package endpointspb;
+option go_package = "github.com/rednafi/examples/endpoints/api";
+
+service Endpoints {
+  rpc Greet(GreetRequest) returns (GreetResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}
+
+message GreetRequest  { string name = 1; int32 formality = 2; }
+message GreetResponse { string message = 1; }
+
+message CreateUserRequest  { string email = 1; int32 age = 2; }
+message CreateUserResponse { string id = 1; }
