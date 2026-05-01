@@ -2,22 +2,20 @@
 
 Companion code for [Generalizing RPC wire plumbing with "endpoints"](https://rednafi.com/go/endpoint-pattern/).
 
-The same `greet.Service` is served over HTTP (`:8080`) and gRPC (`:9090`) by a
-single generic adapter per transport. Adding an endpoint means writing one
-input struct, one output struct, one business function, and a small decode and
-encode pair per transport — the wire plumbing is written once.
+The same `greet.Service` is served over HTTP (`:8080`) and gRPC (`:9090`).
+Each transport package contains its own generic `Wrap` adapter, per-endpoint
+decoders and encoders, and a small error mapper. The domain package never
+imports either transport.
 
 ### Layout
 
 ```
 endpoints/
-├── api/               # protobuf-generated types
-├── errs/              # transport-agnostic error codes
-├── greet/             # domain: In, Out, Validate, Service.Greet, Service.CreateUser
-├── transport/         # WrapHTTP, WrapGRPC, error mappers
-├── httpapi/           # HTTP decoders/encoders + RegisterRoutes
-├── grpcapi/           # gRPC decoders/encoders + Server
-└── main.go            # `go run . http` or `go run . grpc`
+├── greet/                # domain: types, validation, service, error vocabulary
+├── http/                 # HTTP wiring (package http, alias on import)
+├── grpc/                 # gRPC wiring (package grpc, alias on import)
+│   └── api/              # generated protobuf
+└── cmd/server/           # main, wires it together
 ```
 
 ### Run tests
@@ -29,6 +27,6 @@ go test ./...
 ### Run servers
 
 ```sh
-go run . http  # POST http://localhost:8080/greet
-go run . grpc  # endpointspb.Endpoints on :9090
+go run ./cmd/server http   # POST http://localhost:8080/greet
+go run ./cmd/server grpc   # greeterpb.Greeter on :9090
 ```

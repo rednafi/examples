@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.9
 // 	protoc        v7.34.1
-// source: api/endpoints.proto
+// source: grpc/api/greeter.proto
 
 package api
 
@@ -31,7 +31,7 @@ type GreetRequest struct {
 
 func (x *GreetRequest) Reset() {
 	*x = GreetRequest{}
-	mi := &file_api_endpoints_proto_msgTypes[0]
+	mi := &file_grpc_api_greeter_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *GreetRequest) String() string {
 func (*GreetRequest) ProtoMessage() {}
 
 func (x *GreetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_endpoints_proto_msgTypes[0]
+	mi := &file_grpc_api_greeter_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *GreetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GreetRequest.ProtoReflect.Descriptor instead.
 func (*GreetRequest) Descriptor() ([]byte, []int) {
-	return file_api_endpoints_proto_rawDescGZIP(), []int{0}
+	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GreetRequest) GetName() string {
@@ -82,7 +82,7 @@ type GreetResponse struct {
 
 func (x *GreetResponse) Reset() {
 	*x = GreetResponse{}
-	mi := &file_api_endpoints_proto_msgTypes[1]
+	mi := &file_grpc_api_greeter_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +94,7 @@ func (x *GreetResponse) String() string {
 func (*GreetResponse) ProtoMessage() {}
 
 func (x *GreetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_endpoints_proto_msgTypes[1]
+	mi := &file_grpc_api_greeter_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *GreetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GreetResponse.ProtoReflect.Descriptor instead.
 func (*GreetResponse) Descriptor() ([]byte, []int) {
-	return file_api_endpoints_proto_rawDescGZIP(), []int{1}
+	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GreetResponse) GetMessage() string {
@@ -117,29 +117,29 @@ func (x *GreetResponse) GetMessage() string {
 	return ""
 }
 
-type CreateUserRequest struct {
+type SubscribeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Age           int32                  `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`
+	Formality     int32                  `protobuf:"varint,2,opt,name=formality,proto3" json:"formality,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateUserRequest) Reset() {
-	*x = CreateUserRequest{}
-	mi := &file_api_endpoints_proto_msgTypes[2]
+func (x *SubscribeRequest) Reset() {
+	*x = SubscribeRequest{}
+	mi := &file_grpc_api_greeter_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateUserRequest) String() string {
+func (x *SubscribeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateUserRequest) ProtoMessage() {}
+func (*SubscribeRequest) ProtoMessage() {}
 
-func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_endpoints_proto_msgTypes[2]
+func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_api_greeter_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -150,47 +150,47 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
-func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_api_endpoints_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
+func (*SubscribeRequest) Descriptor() ([]byte, []int) {
+	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *CreateUserRequest) GetEmail() string {
+func (x *SubscribeRequest) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *CreateUserRequest) GetAge() int32 {
+func (x *SubscribeRequest) GetFormality() int32 {
 	if x != nil {
-		return x.Age
+		return x.Formality
 	}
 	return 0
 }
 
-type CreateUserResponse struct {
+type SubscribeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateUserResponse) Reset() {
-	*x = CreateUserResponse{}
-	mi := &file_api_endpoints_proto_msgTypes[3]
+func (x *SubscribeResponse) Reset() {
+	*x = SubscribeResponse{}
+	mi := &file_grpc_api_greeter_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateUserResponse) String() string {
+func (x *SubscribeResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateUserResponse) ProtoMessage() {}
+func (*SubscribeResponse) ProtoMessage() {}
 
-func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_endpoints_proto_msgTypes[3]
+func (x *SubscribeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_api_greeter_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -201,62 +201,61 @@ func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
-func (*CreateUserResponse) Descriptor() ([]byte, []int) {
-	return file_api_endpoints_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use SubscribeResponse.ProtoReflect.Descriptor instead.
+func (*SubscribeResponse) Descriptor() ([]byte, []int) {
+	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *CreateUserResponse) GetId() string {
+func (x *SubscribeResponse) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-var File_api_endpoints_proto protoreflect.FileDescriptor
+var File_grpc_api_greeter_proto protoreflect.FileDescriptor
 
-const file_api_endpoints_proto_rawDesc = "" +
+const file_grpc_api_greeter_proto_rawDesc = "" +
 	"\n" +
-	"\x13api/endpoints.proto\x12\vendpointspb\"@\n" +
+	"\x16grpc/api/greeter.proto\x12\tgreeterpb\"@\n" +
 	"\fGreetRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
 	"\tformality\x18\x02 \x01(\x05R\tformality\")\n" +
 	"\rGreetResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\";\n" +
-	"\x11CreateUserRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x10\n" +
-	"\x03age\x18\x02 \x01(\x05R\x03age\"$\n" +
-	"\x12CreateUserResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\x9a\x01\n" +
-	"\tEndpoints\x12>\n" +
-	"\x05Greet\x12\x19.endpointspb.GreetRequest\x1a\x1a.endpointspb.GreetResponse\x12M\n" +
-	"\n" +
-	"CreateUser\x12\x1e.endpointspb.CreateUserRequest\x1a\x1f.endpointspb.CreateUserResponseB+Z)github.com/rednafi/examples/endpoints/apib\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage\"F\n" +
+	"\x10SubscribeRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1c\n" +
+	"\tformality\x18\x02 \x01(\x05R\tformality\"#\n" +
+	"\x11SubscribeResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\x8d\x01\n" +
+	"\aGreeter\x12:\n" +
+	"\x05Greet\x12\x17.greeterpb.GreetRequest\x1a\x18.greeterpb.GreetResponse\x12F\n" +
+	"\tSubscribe\x12\x1b.greeterpb.SubscribeRequest\x1a\x1c.greeterpb.SubscribeResponseB0Z.github.com/rednafi/examples/endpoints/grpc/apib\x06proto3"
 
 var (
-	file_api_endpoints_proto_rawDescOnce sync.Once
-	file_api_endpoints_proto_rawDescData []byte
+	file_grpc_api_greeter_proto_rawDescOnce sync.Once
+	file_grpc_api_greeter_proto_rawDescData []byte
 )
 
-func file_api_endpoints_proto_rawDescGZIP() []byte {
-	file_api_endpoints_proto_rawDescOnce.Do(func() {
-		file_api_endpoints_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_endpoints_proto_rawDesc), len(file_api_endpoints_proto_rawDesc)))
+func file_grpc_api_greeter_proto_rawDescGZIP() []byte {
+	file_grpc_api_greeter_proto_rawDescOnce.Do(func() {
+		file_grpc_api_greeter_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_grpc_api_greeter_proto_rawDesc), len(file_grpc_api_greeter_proto_rawDesc)))
 	})
-	return file_api_endpoints_proto_rawDescData
+	return file_grpc_api_greeter_proto_rawDescData
 }
 
-var file_api_endpoints_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_api_endpoints_proto_goTypes = []any{
-	(*GreetRequest)(nil),       // 0: endpointspb.GreetRequest
-	(*GreetResponse)(nil),      // 1: endpointspb.GreetResponse
-	(*CreateUserRequest)(nil),  // 2: endpointspb.CreateUserRequest
-	(*CreateUserResponse)(nil), // 3: endpointspb.CreateUserResponse
+var file_grpc_api_greeter_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_grpc_api_greeter_proto_goTypes = []any{
+	(*GreetRequest)(nil),      // 0: greeterpb.GreetRequest
+	(*GreetResponse)(nil),     // 1: greeterpb.GreetResponse
+	(*SubscribeRequest)(nil),  // 2: greeterpb.SubscribeRequest
+	(*SubscribeResponse)(nil), // 3: greeterpb.SubscribeResponse
 }
-var file_api_endpoints_proto_depIdxs = []int32{
-	0, // 0: endpointspb.Endpoints.Greet:input_type -> endpointspb.GreetRequest
-	2, // 1: endpointspb.Endpoints.CreateUser:input_type -> endpointspb.CreateUserRequest
-	1, // 2: endpointspb.Endpoints.Greet:output_type -> endpointspb.GreetResponse
-	3, // 3: endpointspb.Endpoints.CreateUser:output_type -> endpointspb.CreateUserResponse
+var file_grpc_api_greeter_proto_depIdxs = []int32{
+	0, // 0: greeterpb.Greeter.Greet:input_type -> greeterpb.GreetRequest
+	2, // 1: greeterpb.Greeter.Subscribe:input_type -> greeterpb.SubscribeRequest
+	1, // 2: greeterpb.Greeter.Greet:output_type -> greeterpb.GreetResponse
+	3, // 3: greeterpb.Greeter.Subscribe:output_type -> greeterpb.SubscribeResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -264,26 +263,26 @@ var file_api_endpoints_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_api_endpoints_proto_init() }
-func file_api_endpoints_proto_init() {
-	if File_api_endpoints_proto != nil {
+func init() { file_grpc_api_greeter_proto_init() }
+func file_grpc_api_greeter_proto_init() {
+	if File_grpc_api_greeter_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_endpoints_proto_rawDesc), len(file_api_endpoints_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_grpc_api_greeter_proto_rawDesc), len(file_grpc_api_greeter_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_api_endpoints_proto_goTypes,
-		DependencyIndexes: file_api_endpoints_proto_depIdxs,
-		MessageInfos:      file_api_endpoints_proto_msgTypes,
+		GoTypes:           file_grpc_api_greeter_proto_goTypes,
+		DependencyIndexes: file_grpc_api_greeter_proto_depIdxs,
+		MessageInfos:      file_grpc_api_greeter_proto_msgTypes,
 	}.Build()
-	File_api_endpoints_proto = out.File
-	file_api_endpoints_proto_goTypes = nil
-	file_api_endpoints_proto_depIdxs = nil
+	File_grpc_api_greeter_proto = out.File
+	file_grpc_api_greeter_proto_goTypes = nil
+	file_grpc_api_greeter_proto_depIdxs = nil
 }

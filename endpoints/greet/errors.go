@@ -1,10 +1,9 @@
-// Package errs defines transport-agnostic error codes and a small error type.
-// Business code returns these so handlers can map them to HTTP statuses or
-// gRPC codes without coupling to either.
-package errs
+package greet
 
 import "fmt"
 
+// Code names a failure mode in domain terms. The HTTP and gRPC packages
+// each map it onto their own status enum.
 type Code int
 
 const (

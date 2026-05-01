@@ -1,0 +1,14 @@
+syntax = "proto3";
+package greeterpb;
+option go_package = "github.com/rednafi/examples/endpoints/grpc/api";
+
+service Greeter {
+  rpc Greet(GreetRequest) returns (GreetResponse);
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
+}
+
+message GreetRequest  { string name = 1; int32 formality = 2; }
+message GreetResponse { string message = 1; }
+
+message SubscribeRequest  { string email = 1; int32 formality = 2; }
+message SubscribeResponse { string id = 1; }

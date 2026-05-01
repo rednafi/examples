@@ -1,16 +1,19 @@
-// Package greet holds the domain types and the business functions.
-//
-// Nothing here imports net/http, google.golang.org/grpc, encoding/json,
-// or anything from api. That is the test of whether the layering is right.
+// Package greet is the domain. Types, validation rules, the service, and
+// the error vocabulary all live here. Nothing in this package imports a
+// transport (net/http, google.golang.org/grpc) or a wire format (encoding/json,
+// google.golang.org/protobuf). That is the test of whether the layering is
+// right; grep this directory for those imports and the result should be empty.
 package greet
 
 import (
 	"context"
+	"fmt"
 	"strings"
-
-	"github.com/rednafi/examples/endpoints/errs"
+	"sync"
 )
 
+// GreetIn is the input to Greet. It is a plain Go struct with no
+// JSON tags or protobuf annotations.
 type GreetIn struct {
 	Name      string
 	Formality int
@@ -18,10 +21,10 @@ type GreetIn struct {
 
 func (in GreetIn) Validate() error {
 	if in.Name == "" {
-		return errs.Invalid("name is required")
+		return Invalid("name is required")
 	}
 	if in.Formality < 0 || in.Formality > 1 {
-		return errs.Invalid("formality must be 0 or 1")
+		return Invalid("formality must be 0 or 1")
 	}
 	return nil
 }
@@ -30,34 +33,32 @@ type GreetOut struct {
 	Message string
 }
 
-type CreateUserIn struct {
-	Email string
-	Age   int
+type SubscribeIn struct {
+	Email     string
+	Formality int
 }
 
-func (in CreateUserIn) Validate() error {
+func (in SubscribeIn) Validate() error {
 	if !strings.Contains(in.Email, "@") {
-		return errs.Invalid("email must contain @")
+		return Invalid("email must contain @")
 	}
-	if in.Age < 0 {
-		return errs.Invalid("age must be >= 0")
-	}
-	if in.Age > 150 {
-		return errs.Invalid("age must be <= 150")
+	if in.Formality < 0 || in.Formality > 1 {
+		return Invalid("formality must be 0 or 1")
 	}
 	return nil
 }
 
-type CreateUserOut struct {
+type SubscribeOut struct {
 	ID string
 }
 
 type Service struct {
-	users map[string]string
+	mu   sync.Mutex
+	subs map[string]string
 }
 
 func NewService() *Service {
-	return &Service{users: make(map[string]string)}
+	return &Service{subs: make(map[string]string)}
 }
 
 func (s *Service) Greet(_ context.Context, in GreetIn) (GreetOut, error) {
@@ -67,11 +68,13 @@ func (s *Service) Greet(_ context.Context, in GreetIn) (GreetOut, error) {
 	return GreetOut{Message: "hey " + in.Name + "!"}, nil
 }
 
-func (s *Service) CreateUser(_ context.Context, in CreateUserIn) (CreateUserOut, error) {
-	if _, ok := s.users[in.Email]; ok {
-		return CreateUserOut{}, errs.AlreadyExists("user already exists")
+func (s *Service) Subscribe(_ context.Context, in SubscribeIn) (SubscribeOut, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, ok := s.subs[in.Email]; ok {
+		return SubscribeOut{}, AlreadyExists("already subscribed")
 	}
-	id := "u_" + in.Email
-	s.users[in.Email] = id
-	return CreateUserOut{ID: id}, nil
+	id := fmt.Sprintf("sub_%d", len(s.subs)+1)
+	s.subs[in.Email] = id
+	return SubscribeOut{ID: id}, nil
 }
