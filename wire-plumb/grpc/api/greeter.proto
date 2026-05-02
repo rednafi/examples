@@ -1,0 +1,14 @@
+syntax = "proto3";
+package greeterpb;
+option go_package = "github.com/rednafi/examples/wire-plumb/grpc/api";
+
+service Greeter {
+  rpc Greet(GreetRequest) returns (GreetResponse);
+  rpc Farewell(FarewellRequest) returns (FarewellResponse);
+}
+
+message GreetRequest    { int64 user_id = 1; int32 formality = 2; }
+message GreetResponse   { string message = 1; }
+
+message FarewellRequest  { int64 user_id = 1; }
+message FarewellResponse { string message = 1; }

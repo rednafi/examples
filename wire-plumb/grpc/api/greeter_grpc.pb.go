@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Greeter_Greet_FullMethodName     = "/greeterpb.Greeter/Greet"
-	Greeter_Subscribe_FullMethodName = "/greeterpb.Greeter/Subscribe"
+	Greeter_Greet_FullMethodName    = "/greeterpb.Greeter/Greet"
+	Greeter_Farewell_FullMethodName = "/greeterpb.Greeter/Farewell"
 )
 
 // GreeterClient is the client API for Greeter service.
@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GreeterClient interface {
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
-	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*SubscribeResponse, error)
+	Farewell(ctx context.Context, in *FarewellRequest, opts ...grpc.CallOption) (*FarewellResponse, error)
 }
 
 type greeterClient struct {
@@ -49,10 +49,10 @@ func (c *greeterClient) Greet(ctx context.Context, in *GreetRequest, opts ...grp
 	return out, nil
 }
 
-func (c *greeterClient) Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*SubscribeResponse, error) {
+func (c *greeterClient) Farewell(ctx context.Context, in *FarewellRequest, opts ...grpc.CallOption) (*FarewellResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SubscribeResponse)
-	err := c.cc.Invoke(ctx, Greeter_Subscribe_FullMethodName, in, out, cOpts...)
+	out := new(FarewellResponse)
+	err := c.cc.Invoke(ctx, Greeter_Farewell_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *greeterClient) Subscribe(ctx context.Context, in *SubscribeRequest, opt
 // for forward compatibility.
 type GreeterServer interface {
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
-	Subscribe(context.Context, *SubscribeRequest) (*SubscribeResponse, error)
+	Farewell(context.Context, *FarewellRequest) (*FarewellResponse, error)
 	mustEmbedUnimplementedGreeterServer()
 }
 
@@ -78,8 +78,8 @@ type UnimplementedGreeterServer struct{}
 func (UnimplementedGreeterServer) Greet(context.Context, *GreetRequest) (*GreetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Greet not implemented")
 }
-func (UnimplementedGreeterServer) Subscribe(context.Context, *SubscribeRequest) (*SubscribeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
+func (UnimplementedGreeterServer) Farewell(context.Context, *FarewellRequest) (*FarewellResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Farewell not implemented")
 }
 func (UnimplementedGreeterServer) mustEmbedUnimplementedGreeterServer() {}
 func (UnimplementedGreeterServer) testEmbeddedByValue()                 {}
@@ -120,20 +120,20 @@ func _Greeter_Greet_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Greeter_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SubscribeRequest)
+func _Greeter_Farewell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FarewellRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GreeterServer).Subscribe(ctx, in)
+		return srv.(GreeterServer).Farewell(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Greeter_Subscribe_FullMethodName,
+		FullMethod: Greeter_Farewell_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GreeterServer).Subscribe(ctx, req.(*SubscribeRequest))
+		return srv.(GreeterServer).Farewell(ctx, req.(*FarewellRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -150,8 +150,8 @@ var Greeter_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Greeter_Greet_Handler,
 		},
 		{
-			MethodName: "Subscribe",
-			Handler:    _Greeter_Subscribe_Handler,
+			MethodName: "Farewell",
+			Handler:    _Greeter_Farewell_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,4 +1,4 @@
-module github.com/rednafi/examples/endpoints
+module github.com/rednafi/examples/wire-plumb
 
 go 1.26.2
 

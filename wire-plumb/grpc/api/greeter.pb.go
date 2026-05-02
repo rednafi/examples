@@ -23,7 +23,7 @@ const (
 
 type GreetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Formality     int32                  `protobuf:"varint,2,opt,name=formality,proto3" json:"formality,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -59,11 +59,11 @@ func (*GreetRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GreetRequest) GetName() string {
+func (x *GreetRequest) GetUserId() int64 {
 	if x != nil {
-		return x.Name
+		return x.UserId
 	}
-	return ""
+	return 0
 }
 
 func (x *GreetRequest) GetFormality() int32 {
@@ -117,28 +117,27 @@ func (x *GreetResponse) GetMessage() string {
 	return ""
 }
 
-type SubscribeRequest struct {
+type FarewellRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Formality     int32                  `protobuf:"varint,2,opt,name=formality,proto3" json:"formality,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SubscribeRequest) Reset() {
-	*x = SubscribeRequest{}
+func (x *FarewellRequest) Reset() {
+	*x = FarewellRequest{}
 	mi := &file_grpc_api_greeter_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SubscribeRequest) String() string {
+func (x *FarewellRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SubscribeRequest) ProtoMessage() {}
+func (*FarewellRequest) ProtoMessage() {}
 
-func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
+func (x *FarewellRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_grpc_api_greeter_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -150,46 +149,39 @@ func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
-func (*SubscribeRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use FarewellRequest.ProtoReflect.Descriptor instead.
+func (*FarewellRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SubscribeRequest) GetEmail() string {
+func (x *FarewellRequest) GetUserId() int64 {
 	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *SubscribeRequest) GetFormality() int32 {
-	if x != nil {
-		return x.Formality
+		return x.UserId
 	}
 	return 0
 }
 
-type SubscribeResponse struct {
+type FarewellResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SubscribeResponse) Reset() {
-	*x = SubscribeResponse{}
+func (x *FarewellResponse) Reset() {
+	*x = FarewellResponse{}
 	mi := &file_grpc_api_greeter_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SubscribeResponse) String() string {
+func (x *FarewellResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SubscribeResponse) ProtoMessage() {}
+func (*FarewellResponse) ProtoMessage() {}
 
-func (x *SubscribeResponse) ProtoReflect() protoreflect.Message {
+func (x *FarewellResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_grpc_api_greeter_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -201,14 +193,14 @@ func (x *SubscribeResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubscribeResponse.ProtoReflect.Descriptor instead.
-func (*SubscribeResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use FarewellResponse.ProtoReflect.Descriptor instead.
+func (*FarewellResponse) Descriptor() ([]byte, []int) {
 	return file_grpc_api_greeter_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SubscribeResponse) GetId() string {
+func (x *FarewellResponse) GetMessage() string {
 	if x != nil {
-		return x.Id
+		return x.Message
 	}
 	return ""
 }
@@ -217,20 +209,19 @@ var File_grpc_api_greeter_proto protoreflect.FileDescriptor
 
 const file_grpc_api_greeter_proto_rawDesc = "" +
 	"\n" +
-	"\x16grpc/api/greeter.proto\x12\tgreeterpb\"@\n" +
-	"\fGreetRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
+	"\x16grpc/api/greeter.proto\x12\tgreeterpb\"E\n" +
+	"\fGreetRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1c\n" +
 	"\tformality\x18\x02 \x01(\x05R\tformality\")\n" +
 	"\rGreetResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"F\n" +
-	"\x10SubscribeRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1c\n" +
-	"\tformality\x18\x02 \x01(\x05R\tformality\"#\n" +
-	"\x11SubscribeResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\x8d\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"*\n" +
+	"\x0fFarewellRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\",\n" +
+	"\x10FarewellResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\x8a\x01\n" +
 	"\aGreeter\x12:\n" +
-	"\x05Greet\x12\x17.greeterpb.GreetRequest\x1a\x18.greeterpb.GreetResponse\x12F\n" +
-	"\tSubscribe\x12\x1b.greeterpb.SubscribeRequest\x1a\x1c.greeterpb.SubscribeResponseB0Z.github.com/rednafi/examples/endpoints/grpc/apib\x06proto3"
+	"\x05Greet\x12\x17.greeterpb.GreetRequest\x1a\x18.greeterpb.GreetResponse\x12C\n" +
+	"\bFarewell\x12\x1a.greeterpb.FarewellRequest\x1a\x1b.greeterpb.FarewellResponseB1Z/github.com/rednafi/examples/wire-plumb/grpc/apib\x06proto3"
 
 var (
 	file_grpc_api_greeter_proto_rawDescOnce sync.Once
@@ -246,16 +237,16 @@ func file_grpc_api_greeter_proto_rawDescGZIP() []byte {
 
 var file_grpc_api_greeter_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_grpc_api_greeter_proto_goTypes = []any{
-	(*GreetRequest)(nil),      // 0: greeterpb.GreetRequest
-	(*GreetResponse)(nil),     // 1: greeterpb.GreetResponse
-	(*SubscribeRequest)(nil),  // 2: greeterpb.SubscribeRequest
-	(*SubscribeResponse)(nil), // 3: greeterpb.SubscribeResponse
+	(*GreetRequest)(nil),     // 0: greeterpb.GreetRequest
+	(*GreetResponse)(nil),    // 1: greeterpb.GreetResponse
+	(*FarewellRequest)(nil),  // 2: greeterpb.FarewellRequest
+	(*FarewellResponse)(nil), // 3: greeterpb.FarewellResponse
 }
 var file_grpc_api_greeter_proto_depIdxs = []int32{
 	0, // 0: greeterpb.Greeter.Greet:input_type -> greeterpb.GreetRequest
-	2, // 1: greeterpb.Greeter.Subscribe:input_type -> greeterpb.SubscribeRequest
+	2, // 1: greeterpb.Greeter.Farewell:input_type -> greeterpb.FarewellRequest
 	1, // 2: greeterpb.Greeter.Greet:output_type -> greeterpb.GreetResponse
-	3, // 3: greeterpb.Greeter.Subscribe:output_type -> greeterpb.SubscribeResponse
+	3, // 3: greeterpb.Greeter.Farewell:output_type -> greeterpb.FarewellResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

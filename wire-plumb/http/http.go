@@ -1,10 +1,4 @@
-// Package http is the HTTP wiring for the greet domain. It contains:
-//
-//  1. Wrap, the generic adapter that turns a (ctx, In) -> (Out, error)
-//     function into an http.Handler.
-//  2. Per-endpoint decode and encode functions.
-//  3. Register, which mounts every endpoint onto an *http.ServeMux.
-//  4. Error mapping from greet error codes to HTTP statuses.
+// Package http is the HTTP wiring for the greet domain.
 //
 // Package name http shadows net/http for outside importers; alias this
 // package as ehttp at the call site and leave net/http plain.
@@ -17,13 +11,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rednafi/examples/endpoints/greet"
+	"github.com/rednafi/examples/wire-plumb/greet"
 )
 
 type validator interface{ Validate() error }
 
 // Wrap turns a domain function into an HTTP handler. The decode and encode
-// callbacks are the only place HTTP-specific types appear at the call site.
+// callbacks are the only place HTTP-specific types appear.
 func Wrap[In, Out any](
 	decode func(*http.Request) (In, error),
 	fn func(context.Context, In) (Out, error),
@@ -57,13 +51,13 @@ func Wrap[In, Out any](
 
 func decodeGreet(r *http.Request) (greet.GreetIn, error) {
 	var body struct {
-		Name      string `json:"name"`
-		Formality int    `json:"formality"`
+		UserID    int64 `json:"user_id"`
+		Formality int   `json:"formality"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return greet.GreetIn{}, greet.Invalid("malformed json")
 	}
-	return greet.GreetIn{Name: body.Name, Formality: body.Formality}, nil
+	return greet.GreetIn{UserID: body.UserID, Formality: body.Formality}, nil
 }
 
 func encodeGreet(w http.ResponseWriter, out greet.GreetOut) error {
@@ -74,39 +68,37 @@ func encodeGreet(w http.ResponseWriter, out greet.GreetOut) error {
 	}{out.Message})
 }
 
-func decodeSubscribe(r *http.Request) (greet.SubscribeIn, error) {
+func decodeFarewell(r *http.Request) (greet.FarewellIn, error) {
 	var body struct {
-		Email     string `json:"email"`
-		Formality int    `json:"formality"`
+		UserID int64 `json:"user_id"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return greet.SubscribeIn{}, greet.Invalid("malformed json")
+		return greet.FarewellIn{}, greet.Invalid("malformed json")
 	}
-	return greet.SubscribeIn{Email: body.Email, Formality: body.Formality}, nil
+	return greet.FarewellIn{UserID: body.UserID}, nil
 }
 
-func encodeSubscribe(w http.ResponseWriter, out greet.SubscribeOut) error {
+func encodeFarewell(w http.ResponseWriter, out greet.FarewellOut) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(struct {
-		ID string `json:"id"`
-	}{out.ID})
+		Message string `json:"message"`
+	}{out.Message})
 }
 
-// Register mounts every greet endpoint on mux.
 func Register(mux *http.ServeMux, svc *greet.Service) {
 	mux.Handle("POST /greet", Wrap(decodeGreet, svc.Greet, encodeGreet))
-	mux.Handle("POST /subscribe", Wrap(decodeSubscribe, svc.Subscribe, encodeSubscribe))
+	mux.Handle("POST /farewell", Wrap(decodeFarewell, svc.Farewell, encodeFarewell))
 }
 
 func writeErr(w http.ResponseWriter, err error) {
-	var de *greet.Error
-	if !errors.As(err, &de) {
-		de = greet.Internal(err)
+	var domainErr *greet.Error
+	if !errors.As(err, &domainErr) {
+		domainErr = greet.Internal(err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusFor(de.Code))
-	_ = json.NewEncoder(w).Encode(map[string]string{"message": de.Message})
+	w.WriteHeader(statusFor(domainErr.Code))
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": domainErr.Message})
 }
 
 func statusFor(c greet.Code) int {
