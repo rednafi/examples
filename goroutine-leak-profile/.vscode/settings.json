@@ -1,0 +1,8 @@
+{
+  "go.testEnvVars": {
+    "GOEXPERIMENT": "goroutineleakprofile"
+  },
+  "terminal.integrated.env.osx": {
+    "GOEXPERIMENT": "goroutineleakprofile"
+  }
+}
