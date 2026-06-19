@@ -1,5 +1,5 @@
 // Package testmain fails the whole test run on a leaked goroutine using a
-// TestMain check, the way uber-go/goleak's VerifyTestMain does.
+// TestMain check shaped like uber-go/goleak's VerifyTestMain.
 package testmain
 
 func leak() {

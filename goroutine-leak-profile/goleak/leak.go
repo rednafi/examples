@@ -1,5 +1,5 @@
-// Package goleak fails a test on a leaked goroutine using the stdlib
-// goroutineleak profile, the way uber-go/goleak does it.
+// Package goleak fails a test on a leaked goroutine using a VerifyNone-shaped
+// helper around the stdlib goroutineleak profile.
 package goleak
 
 func leak() {

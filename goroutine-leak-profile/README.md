@@ -4,9 +4,9 @@ Companion code for
 [Accepted proposal: a goroutine leak profile in the Go standard library](https://rednafi.com/shards/2026/06/go-goroutine-leak-profile/).
 
 Go 1.27 adds a `goroutineleak` profile to `runtime/pprof` (golang/go#74609). It leans on
-the garbage collector to find goroutines blocked on a channel or lock that nothing
-runnable can ever reach, so everything it reports is stuck for good, with no false
-positives.
+the garbage collector to find goroutines blocked on a channel, lock, or another concurrency
+primitive that no runnable goroutine can reach. It reports only goroutines the runtime can
+prove cannot become unblocked.
 
 On the 1.26 toolchain the profile is behind an experiment, so every command below needs
 the build prefix:
