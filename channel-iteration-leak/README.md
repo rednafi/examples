@@ -23,7 +23,9 @@ formats and entry points.
 
 A tiny cron-style scheduler. On a tick it dispatches the due jobs, each reports its outcome
 on a channel, and one collector ranges over that channel. `tick` forgets to close it and
-leaks the collector; `tickClosed` is the same code with the missing `close`.
+leaks the collector; `tickClosed` is the same code with the missing `close`. `tickStream` is
+the sturdier shape: the drain runs in the caller, and a dedicated goroutine owns the `close`,
+so forgetting it deadlocks the caller on the first run instead of leaking quietly.
 
 ```sh
 GOEXPERIMENT=goroutineleakprofile go run ./scheduler

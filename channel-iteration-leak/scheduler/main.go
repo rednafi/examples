@@ -77,6 +77,34 @@ func tickClosed(due []Job) []outcome {
 	return log
 }
 
+// tickStream is the sturdier shape that sidesteps the trap. The drain runs in
+// the caller that owns log, and a dedicated goroutine closes results once every
+// producer has reported. Forget the close here and the caller blocks on the spot
+// instead of stranding a background goroutine, so the same mistake surfaces as a
+// deadlock on the first run rather than a leak only a profiler can see.
+func tickStream(due []Job, process func(outcome)) []outcome {
+	results := make(chan outcome) // unbuffered: stream results as they complete
+
+	var wg sync.WaitGroup
+	for _, j := range due {
+		wg.Go(func() {
+			results <- outcome{job: j.Name, err: j.Run()}
+		})
+	}
+
+	go func() {
+		wg.Wait()
+		close(results) // the producers' job: close once, when they're all done
+	}()
+
+	log := make([]outcome, 0, len(due))
+	for r := range results {
+		process(r) // handle one result immediately
+		log = append(log, r)
+	}
+	return log
+}
+
 func main() {
 	due := []Job{
 		{Name: "backup", Run: func() error { return nil }},

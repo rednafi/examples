@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"runtime"
 	"runtime/pprof"
 	"strings"
@@ -19,6 +20,48 @@ func leaked() (string, bool) {
 	var b bytes.Buffer
 	p.WriteTo(&b, 1)
 	return b.String(), p.Count() > 0
+}
+
+// leakCount runs the leak-detecting GC cycle and returns how many goroutines are
+// provably stuck right now. The profile is process-global, so other tests' leaks
+// linger; compare a before/after delta rather than an absolute count.
+func leakCount() int {
+	p := pprof.Lookup("goroutineleak")
+	if p == nil {
+		return 0
+	}
+	p.WriteTo(io.Discard, 1)
+	return p.Count()
+}
+
+func TestTickStream(t *testing.T) {
+	if pprof.Lookup("goroutineleak") == nil {
+		t.Skip("rerun with GOEXPERIMENT=goroutineleakprofile")
+	}
+
+	due := []Job{
+		{Name: "backup", Run: func() error { return nil }},
+		{Name: "rotate-logs", Run: func() error { return nil }},
+		{Name: "send-digest", Run: func() error { return nil }},
+	}
+
+	runtime.Gosched()
+	before := leakCount()
+
+	var streamed []string
+	log := tickStream(due, func(o outcome) { streamed = append(streamed, o.job) })
+	runtime.Gosched()
+
+	if after := leakCount(); after != before {
+		report, _ := leaked()
+		t.Fatalf("tickStream leaked %d goroutine(s):\n%s", after-before, report)
+	}
+	if len(log) != len(due) {
+		t.Fatalf("got %d outcomes, want %d", len(log), len(due))
+	}
+	if len(streamed) != len(due) {
+		t.Fatalf("process called %d times, want %d", len(streamed), len(due))
+	}
 }
 
 func TestTick(t *testing.T) {
