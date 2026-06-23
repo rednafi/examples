@@ -1,5 +1,5 @@
 // Why three explicit receives are safe but ranging over the same channel leaks.
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./contrast
+// Run: GOEXPERIMENT=goroutineleakprofile go run ./receive-vs-range
 package main
 
 import (

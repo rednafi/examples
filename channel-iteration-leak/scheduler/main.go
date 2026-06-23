@@ -77,11 +77,11 @@ func tickClosed(due []Job) []outcome {
 	return log
 }
 
-// tickFixed is tick written correctly. Each job marks itself done via wg.Go, so
-// the WaitGroup counts producers finishing, not values the collector consumed. A
-// separate goroutine waits for the producers and closes results, and the drain
-// runs here in tickFixed. Drop the close and the range blocks with every producer
-// gone, so the caller deadlocks on the first run instead of leaking a collector.
+// tickFixed is tick written correctly. The buggy version splits the WaitGroup
+// across two goroutines: tick does the Add, the collector does the Done. Here each
+// job marks itself done via wg.Go, a separate goroutine waits and closes results,
+// and the drain runs in tickFixed. Drop the close and the range blocks with every
+// producer gone, so the caller deadlocks on the first run instead of leaking one.
 func tickFixed(due []Job) []outcome {
 	results := make(chan outcome)
 

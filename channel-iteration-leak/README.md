@@ -33,13 +33,13 @@ GOEXPERIMENT=goroutineleakprofile go run ./scheduler
 GOEXPERIMENT=goroutineleakprofile go test ./scheduler
 ```
 
-### contrast
+### receive-vs-range
 
 The same channel, two ways. `explicitReceive` reads three values with three receives and the
 goroutine returns. `rangeNoClose` reads the same three by ranging, then blocks for a fourth
 that never comes. Only the second leaks.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./contrast
-GOEXPERIMENT=goroutineleakprofile go test ./contrast
+GOEXPERIMENT=goroutineleakprofile go run ./receive-vs-range
+GOEXPERIMENT=goroutineleakprofile go test ./receive-vs-range
 ```

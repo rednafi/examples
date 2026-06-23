@@ -1,4 +1,4 @@
-// Run: GOEXPERIMENT=goroutineleakprofile go test ./contrast
+// Run: GOEXPERIMENT=goroutineleakprofile go test ./receive-vs-range
 package main
 
 import (
@@ -19,7 +19,7 @@ func leaked() (string, bool) {
 	return b.String(), p.Count() > 0
 }
 
-func TestContrast(t *testing.T) {
+func TestReceiveVsRange(t *testing.T) {
 	if pprof.Lookup("goroutineleak") == nil {
 		t.Skip("rerun with GOEXPERIMENT=goroutineleakprofile")
 	}
