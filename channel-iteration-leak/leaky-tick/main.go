@@ -1,8 +1,8 @@
-// leaking-tick is the buggy scheduler. On a tick it dispatches the due jobs and
-// a background collector ranges over the results channel. Nothing closes the
-// channel, so after the last outcome the collector blocks forever and leaks.
+// leaky-tick is the buggy scheduler from the post. On a tick it dispatches the
+// due jobs, a background collector ranges over the results channel, and nothing
+// closes the channel. After the last result, the collector waits forever.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./leaking-tick
+// Run: GOEXPERIMENT=goroutineleakprofile go run ./leaky-tick
 package main
 
 import (
@@ -25,9 +25,8 @@ type outcome struct {
 	err error
 }
 
-// tick dispatches every due job and collects their outcomes by ranging over the
-// results channel in a background goroutine. Nothing closes results, so that
-// goroutine leaks.
+// tick starts every due job and collects results in a background goroutine.
+// Nothing closes results, so the collector leaks after all jobs have sent.
 func tick(due []Job) []outcome {
 	results := make(chan outcome)
 
@@ -35,20 +34,20 @@ func tick(due []Job) []outcome {
 	for _, j := range due {
 		wg.Add(1)
 		go func() {
-			results <- outcome{job: j.Name, err: j.Run()} // producer
+			results <- outcome{job: j.Name, err: j.Run()} // (1)
 		}()
 	}
 
 	var log []outcome
 	go func() {
-		for r := range results { // collector: blocks once the jobs stop sending
+		for r := range results { // (2)
 			log = append(log, r)
 			wg.Done()
 		}
 	}()
 
 	wg.Wait()
-	// no close(results): the range above never ends, so the collector leaks
+	// (3) no close(results)
 	return log
 }
 
@@ -58,6 +57,7 @@ func main() {
 		{Name: "rotate-logs", Run: func() error { return nil }},
 		{Name: "send-digest", Run: func() error { return nil }},
 	}
+
 	tick(due)
 	runtime.Gosched() // let the collector reach its blocked receive
 
