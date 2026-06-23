@@ -1,0 +1,10 @@
+# Claude Code local config
+.claude/
+
+# macOS
+.DS_Store
+
+# Go build output
+*.exe
+*.test
+*.out
