@@ -34,7 +34,7 @@ func leakCount() int {
 	return p.Count()
 }
 
-func TestTickStream(t *testing.T) {
+func TestTickFixed(t *testing.T) {
 	if pprof.Lookup("goroutineleak") == nil {
 		t.Skip("rerun with GOEXPERIMENT=goroutineleakprofile")
 	}
@@ -48,19 +48,15 @@ func TestTickStream(t *testing.T) {
 	runtime.Gosched()
 	before := leakCount()
 
-	var streamed []string
-	log := tickStream(due, func(o outcome) { streamed = append(streamed, o.job) })
+	log := tickFixed(due)
 	runtime.Gosched()
 
 	if after := leakCount(); after != before {
 		report, _ := leaked()
-		t.Fatalf("tickStream leaked %d goroutine(s):\n%s", after-before, report)
+		t.Fatalf("tickFixed leaked %d goroutine(s):\n%s", after-before, report)
 	}
 	if len(log) != len(due) {
 		t.Fatalf("got %d outcomes, want %d", len(log), len(due))
-	}
-	if len(streamed) != len(due) {
-		t.Fatalf("process called %d times, want %d", len(streamed), len(due))
 	}
 }
 

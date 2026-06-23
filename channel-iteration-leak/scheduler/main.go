@@ -77,13 +77,13 @@ func tickClosed(due []Job) []outcome {
 	return log
 }
 
-// tickStream is the sturdier shape that sidesteps the trap. The drain runs in
-// the caller that owns log, and a dedicated goroutine closes results once every
-// producer has reported. Forget the close here and the caller blocks on the spot
-// instead of stranding a background goroutine, so the same mistake surfaces as a
-// deadlock on the first run rather than a leak only a profiler can see.
-func tickStream(due []Job, process func(outcome)) []outcome {
-	results := make(chan outcome) // unbuffered: stream results as they complete
+// tickFixed is tick written correctly. Each job marks itself done via wg.Go, so
+// the WaitGroup counts producers finishing, not values the collector consumed. A
+// separate goroutine waits for the producers and closes results, and the drain
+// runs here in tickFixed. Drop the close and the range blocks with every producer
+// gone, so the caller deadlocks on the first run instead of leaking a collector.
+func tickFixed(due []Job) []outcome {
+	results := make(chan outcome)
 
 	var wg sync.WaitGroup
 	for _, j := range due {
@@ -94,12 +94,11 @@ func tickStream(due []Job, process func(outcome)) []outcome {
 
 	go func() {
 		wg.Wait()
-		close(results) // the producers' job: close once, when they're all done
+		close(results)
 	}()
 
-	log := make([]outcome, 0, len(due))
+	var log []outcome
 	for r := range results {
-		process(r) // handle one result immediately
 		log = append(log, r)
 	}
 	return log
