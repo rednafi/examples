@@ -3,6 +3,7 @@ package coalesce
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 
 	"golang.org/x/sync/singleflight"
 )
@@ -55,6 +56,37 @@ func (s *Store) Get(ctx context.Context, key string) (string, error) {
 		s.cache.Set(key, val) // (3)
 		return val, nil
 	})
+	if err != nil {
+		return "", err
+	}
+	return v.(string), nil
+}
+
+// GetWithMetrics is Get with counters for coalesced successes and failures.
+func (s *Store) GetWithMetrics(
+	ctx context.Context,
+	key string,
+	sharedOK *atomic.Int64,
+	sharedErr *atomic.Int64,
+) (string, error) {
+	if v, ok := s.cache.Get(key); ok {
+		return v, nil
+	}
+	v, err, shared := s.group.Do(key, func() (any, error) {
+		val, err := s.fetch(ctx, key)
+		if err != nil {
+			return "", err
+		}
+		s.cache.Set(key, val) // (1)
+		return val, nil
+	})
+	if shared { // (2)
+		if err != nil {
+			sharedErr.Add(1) // (3)
+		} else {
+			sharedOK.Add(1) // (4)
+		}
+	}
 	if err != nil {
 		return "", err
 	}

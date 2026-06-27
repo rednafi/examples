@@ -4,6 +4,7 @@ package coalesce
 
 import (
 	"context"
+	"time"
 
 	"golang.org/x/sync/singleflight"
 )
@@ -31,12 +32,15 @@ func (l *Loader) Load(ctx context.Context, key string) (string, error) {
 	return v.(string), nil
 }
 
-// LoadChan is Load with per-caller cancellation. The shared fetch runs on a
-// context detached from any single caller, so one caller giving up does not
-// cancel the work the others are still waiting on.
-func (l *Loader) LoadChan(ctx context.Context, key string) (string, error) {
+// LoadChan is Load with per-caller cancellation. The shared fetch gets its own
+// timeout and is detached from any single caller, so one caller giving up does
+// not cancel the work the others are still waiting on.
+func (l *Loader) LoadChan(ctx context.Context, key string, fetchTimeout time.Duration) (string, error) {
 	ch := l.group.DoChan(key, func() (any, error) {
-		return l.fetch(context.WithoutCancel(ctx), key) // (2)
+		detached := context.WithoutCancel(ctx) // (2)
+		callCtx, cancel := context.WithTimeout(detached, fetchTimeout)
+		defer cancel()
+		return l.fetch(callCtx, key)
 	})
 	select {
 	case <-ctx.Done(): // (3)
@@ -46,5 +50,26 @@ func (l *Loader) LoadChan(ctx context.Context, key string) (string, error) {
 			return "", res.Err
 		}
 		return res.Val.(string), nil
+	}
+}
+
+// LoadMaxWait starts a fresh call for the next caller if this caller waits too
+// long. Forget does not cancel the in-flight fetch; fetchTimeout still bounds it.
+func (l *Loader) LoadMaxWait(ctx context.Context, key string, fetchTimeout, maxWait time.Duration) (string, error) {
+	ch := l.group.DoChan(key, func() (any, error) {
+		detached := context.WithoutCancel(ctx)
+		callCtx, cancel := context.WithTimeout(detached, fetchTimeout)
+		defer cancel()
+		return l.fetch(callCtx, key)
+	})
+	select {
+	case res := <-ch:
+		if res.Err != nil {
+			return "", res.Err
+		}
+		return res.Val.(string), nil
+	case <-time.After(maxWait):
+		l.group.Forget(key)
+		return "", context.DeadlineExceeded
 	}
 }
