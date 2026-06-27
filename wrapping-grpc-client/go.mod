@@ -1,6 +1,6 @@
 module github.com/rednafi/examples/wrapping-grpc-client
 
-go 1.26.1
+go 1.26.4
 
 require (
 	google.golang.org/grpc v1.79.2

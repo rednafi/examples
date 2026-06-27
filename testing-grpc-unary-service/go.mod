@@ -1,6 +1,6 @@
 module github.com/rednafi/examples/testing-grpc-unary-service
 
-go 1.26.1
+go 1.26.4
 
 require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217

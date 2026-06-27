@@ -1,6 +1,6 @@
 module github.com/rednafi/examples/wire-plumb
 
-go 1.26.2
+go 1.26.4
 
 require (
 	google.golang.org/grpc v1.79.3

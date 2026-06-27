@@ -1,6 +1,6 @@
 module github.com/rednafi/examples/fun-with-struct-tags
 
-go 1.26
+go 1.26.4
 
 require github.com/mailru/easyjson v0.9.2
 
