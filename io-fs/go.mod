@@ -1,5 +1,0 @@
-module github.com/rednafi/examples/io-fs
-
-go 1.26.4
-
-require golang.org/x/tools v0.46.0
