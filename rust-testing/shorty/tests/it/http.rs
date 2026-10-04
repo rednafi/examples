@@ -4,6 +4,7 @@ use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
 use shorty::{http::router, service::Shortener, store::MemStore};
 use http_body_util::BodyExt;
+use tokio::net::TcpListener;
 use tower::ServiceExt;
 
 #[tokio::test]
@@ -19,11 +20,12 @@ async fn known_code_redirects() {
 }
 
 #[tokio::test]
+#[cfg_attr(miri, ignore = "Miri can't open sockets")]
 async fn real_socket_on_a_random_port() {
     let svc = Arc::new(Shortener::new(MemStore::default()));
     let code = svc.shorten("https://crates.io");
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let addr = listener.local_addr().unwrap();
     tokio::spawn(axum::serve(listener, router(svc)).into_future());
 
@@ -31,7 +33,8 @@ async fn real_socket_on_a_random_port() {
         .redirect(reqwest::redirect::Policy::none())
         .build()
         .unwrap();
-    let resp = client.get(format!("http://{addr}/{code}")).send().await.unwrap();
+    let url = format!("http://{addr}/{code}");
+    let resp = client.get(url).send().await.unwrap();
     assert_eq!(resp.status(), 307);
 }
 

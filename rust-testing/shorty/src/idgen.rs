@@ -18,18 +18,24 @@ impl IdGen {
 mod tests {
     use super::*;
     use std::collections::HashSet;
+    use std::sync::Mutex;
     use std::thread;
 
     #[test]
     fn ids_are_unique_across_threads() {
         let ids = IdGen::starting_at(0);
-        let all: Vec<u64> = thread::scope(|s| {
-            let handles: Vec<_> = (0..8)
-                .map(|_| s.spawn(|| (0..1000).map(|_| ids.next()).collect::<Vec<_>>()))
-                .collect();
-            handles.into_iter().flat_map(|h| h.join().unwrap()).collect()
+        let seen = Mutex::new(HashSet::new());
+
+        thread::scope(|s| {
+            for _ in 0..8 {
+                s.spawn(|| {
+                    for _ in 0..1000 {
+                        seen.lock().unwrap().insert(ids.next());
+                    }
+                });
+            }
         });
-        let unique: HashSet<_> = all.iter().collect();
-        assert_eq!(unique.len(), 8000);
+
+        assert_eq!(seen.into_inner().unwrap().len(), 8000);
     }
 }

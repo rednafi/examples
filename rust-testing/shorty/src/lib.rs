@@ -7,6 +7,7 @@ pub mod health;
 pub mod http;
 pub mod idgen;
 pub mod service;
+pub mod service_dyn;
 pub mod store;
 
 #[cfg(any(test, feature = "test-util"))]
@@ -22,6 +23,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        assert_eq!(add(2, 2), 4);
+        let result = add(2, 2);
+        assert_eq!(result, 4);
     }
 }

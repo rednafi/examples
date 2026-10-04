@@ -1,6 +1,6 @@
 /// Sums the first `n + 1` items without bounds checks.
 pub fn sum_through(xs: &[u32], n: usize) -> u32 {
-    assert!(n <= xs.len()); // bug: should be `n < xs.len()`
+    assert!(n <= xs.len()); // bug: should be `<`
     let mut total = 0;
     for i in 0..=n {
         total += unsafe { *xs.as_ptr().add(i) };
