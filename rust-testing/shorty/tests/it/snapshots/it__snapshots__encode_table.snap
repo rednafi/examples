@@ -1,0 +1,9 @@
+---
+source: tests/it/snapshots.rs
+expression: table
+---
+        0 -> 0
+       61 -> Z
+       62 -> 10
+      125 -> 21
+  1000000 -> 4c92

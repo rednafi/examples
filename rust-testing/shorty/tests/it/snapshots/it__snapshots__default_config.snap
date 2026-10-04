@@ -1,0 +1,8 @@
+---
+source: tests/it/snapshots.rs
+expression: cfg
+---
+Config {
+    addr: "0.0.0.0:8080",
+    ttl: 86400s,
+}

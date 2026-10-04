@@ -1,0 +1,29 @@
+error[E0277]: the trait bound `u32: Store` is not satisfied
+ --> tests/ui/not_a_store.rs:4:30
+  |
+4 |     let svc = Shortener::new(42_u32);
+  |               -------------- ^^^^^^ the trait `Store` is not implemented for `u32`
+  |               |
+  |               required by a bound introduced by this call
+  |
+help: the trait `Store` is implemented for `MemStore`
+ --> src/store.rs
+  |
+  | impl Store for MemStore {
+  | ^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `Shortener::<S>::new`
+ --> src/service.rs
+  |
+  | impl<S: Store> Shortener<S> {
+  |         ^^^^^ required by this bound in `Shortener::<S>::new`
+  |     pub fn new(store: S) -> Self {
+  |            --- required by a bound in this associated function
+
+error[E0599]: the method `shorten` exists for struct `Shortener<u32>`, but its trait bounds were not satisfied
+ --> tests/ui/not_a_store.rs:5:9
+  |
+5 |     svc.shorten("https://rust-lang.org");
+  |         ^^^^^^^ method cannot be called on `Shortener<u32>` due to unsatisfied trait bounds
+  |
+  = note: the following trait bounds were not satisfied:
+          `u32: Store`
