@@ -2,13 +2,12 @@
 // Each job marks itself done via wg.Go. A separate goroutine waits for the jobs
 // and closes results, while tick drains the channel itself.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./fixed-semantics-tick
+// Run: go run ./fixed-semantics-tick
 package main
 
 import (
 	"fmt"
 	"io"
-	"os"
 	"runtime"
 	"runtime/pprof"
 	"sync"
@@ -59,10 +58,6 @@ func main() {
 	runtime.Gosched()
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	p.WriteTo(io.Discard, 1)
 	fmt.Printf("recorded %d outcomes\n", len(log))
 	fmt.Printf("leaked goroutines: %d\n", p.Count())

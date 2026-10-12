@@ -2,7 +2,7 @@
 // still queued to send once the first error returns early.
 //
 // Companion to https://rednafi.com/go/early-return-and-goroutine-leak/.
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./earlyreturn
+// Run: go run ./earlyreturn
 package main
 
 import (
@@ -42,9 +42,5 @@ func main() {
 	time.Sleep(100 * time.Millisecond)
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	p.WriteTo(os.Stdout, 1)
 }

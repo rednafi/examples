@@ -1,13 +1,12 @@
 // fixed-tick is the one-line fix for the scheduler: close results after every
 // job has reported, so the collector's range can finish.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./fixed-tick
+// Run: go run ./fixed-tick
 package main
 
 import (
 	"fmt"
 	"io"
-	"os"
 	"runtime"
 	"runtime/pprof"
 	"sync"
@@ -60,10 +59,6 @@ func main() {
 	runtime.Gosched() // let the collector observe the close and return
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	p.WriteTo(io.Discard, 1)
 	fmt.Printf("recorded %d outcomes\n", len(log))
 	fmt.Printf("leaked goroutines: %d\n", p.Count())

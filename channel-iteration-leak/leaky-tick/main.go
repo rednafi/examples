@@ -2,7 +2,7 @@
 // due jobs, a background collector ranges over the results channel, and nothing
 // closes the channel. After the last result, the collector waits forever.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./leaky-tick
+// Run: go run ./leaky-tick
 package main
 
 import (
@@ -62,10 +62,6 @@ func main() {
 	runtime.Gosched() // let the collector reach its blocked receive
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	fmt.Println("--- debug=1: the leaking line ---")
 	p.WriteTo(os.Stdout, 1)
 	fmt.Println("--- debug=2: full dump, leaked goroutine tagged (leaked) ---")

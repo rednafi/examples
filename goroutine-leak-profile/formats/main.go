@@ -1,5 +1,5 @@
 // All output formats of the goroutineleak profile, plus the Count() gotcha.
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./formats
+// Run: go run ./formats
 package main
 
 import (
@@ -29,10 +29,6 @@ func main() {
 	runtime.Gosched() // let both goroutines reach their blocked state
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 
 	// Gotcha: Count() is 0 until a WriteTo runs the leak-detecting GC cycle.
 	fmt.Println("Count() before WriteTo:", p.Count())

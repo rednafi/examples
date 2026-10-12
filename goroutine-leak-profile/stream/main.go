@@ -1,11 +1,10 @@
 // Forgotten close: a consumer ranges over a channel the producer never closes,
 // so it blocks on receive forever after the last value.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./stream
+// Run: go run ./stream
 package main
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"runtime/pprof"
@@ -32,9 +31,5 @@ func main() {
 	runtime.Gosched() // let the consumer reach its blocked receive
 
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	p.WriteTo(os.Stdout, 1)
 }

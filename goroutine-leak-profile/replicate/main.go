@@ -2,7 +2,7 @@
 // answer wins, and the slower replicas block forever trying to send. Same root
 // cause as ./earlyreturn, just framed as replicas.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./replicate
+// Run: go run ./replicate
 package main
 
 import (
@@ -30,9 +30,5 @@ func main() {
 
 	runtime.Gosched() // let the slower replicas reach their blocked sends
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 	p.WriteTo(os.Stdout, 1)
 }

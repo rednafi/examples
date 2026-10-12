@@ -8,16 +8,7 @@ the garbage collector to find goroutines blocked on a channel, lock, or another 
 primitive that no runnable goroutine can reach. It reports only goroutines the runtime can
 prove cannot become unblocked.
 
-On the 1.26 toolchain the profile is behind an experiment, so every command below needs
-the build prefix:
-
-```sh
-GOEXPERIMENT=goroutineleakprofile go run ./earlyreturn
-```
-
-It's on by default in 1.27, where you can drop the prefix. Each directory is a standalone
-`main` (or test) you can run on its own. In VSCode, `.vscode/settings.json` sets the
-experiment for the test runner and the integrated terminal.
+Each directory is a standalone `main` (or test) you can run on its own.
 
 ### earlyreturn
 
@@ -26,7 +17,7 @@ and the workers still queued to send block forever. Background:
 [Early return and goroutine leak](https://rednafi.com/go/early-return-and-goroutine-leak/).
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./earlyreturn
+go run ./earlyreturn
 ```
 
 ### replicate
@@ -35,7 +26,7 @@ The same leak as `earlyreturn` in another guise: fan the same request out to sev
 replicas, keep the first answer, and the slower replicas block forever on their sends.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./replicate
+go run ./replicate
 ```
 
 ### stream
@@ -44,7 +35,7 @@ A consumer ranges over a channel the producer forgets to `close`, so it blocks o
 forever after the last value.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./stream
+go run ./stream
 ```
 
 ### formats
@@ -53,7 +44,7 @@ The `debug` levels (`0` gzipped protobuf, `1` text, `2` full dump) and the gotch
 `Count()` reads `0` until a `WriteTo` runs the detecting GC cycle.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./formats
+go run ./formats
 ```
 
 ### signaldump
@@ -61,7 +52,7 @@ GOEXPERIMENT=goroutineleakprofile go run ./formats
 Dump leaks from a running process on demand with a `SIGUSR1` handler.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./signaldump
+go run ./signaldump
 # in another shell, using the pid printed on start:
 kill -USR1 <pid>
 ```
@@ -72,7 +63,7 @@ Importing `net/http/pprof` registers `/debug/pprof/goroutineleak` on a live serv
 it with curl or `go tool pprof`.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go run ./server
+go run ./server
 # in another shell:
 curl 'localhost:6060/debug/pprof/goroutineleak?debug=1'
 go tool pprof -top 'http://localhost:6060/debug/pprof/goroutineleak'
@@ -81,11 +72,10 @@ go tool pprof -top 'http://localhost:6060/debug/pprof/goroutineleak'
 ### goleak
 
 A `verifyNone(t)` helper you `defer` like `goleak.VerifyNone(t)`. `TestRun` leaks on
-purpose, so with the experiment on it fails and prints the stranded goroutine. Without the
-experiment the profile isn't registered, so the test skips instead of failing.
+purpose, so it fails and prints the stranded goroutine.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go test ./goleak
+go test ./goleak
 ```
 
 ### testmain
@@ -94,5 +84,5 @@ The same idea moved into `TestMain`, like `goleak.VerifyTestMain`. `TestRun` pas
 own, but the run fails because `TestMain` checks for leaks after the suite.
 
 ```sh
-GOEXPERIMENT=goroutineleakprofile go test ./testmain
+go test ./testmain
 ```

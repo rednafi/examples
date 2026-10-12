@@ -1,5 +1,5 @@
 // Pull leaks from a running service over HTTP via net/http/pprof.
-// Run:   GOEXPERIMENT=goroutineleakprofile go run ./server
+// Run:   go run ./server
 // Curl:  curl 'localhost:6060/debug/pprof/goroutineleak?debug=1'
 // Pprof: go tool pprof -top 'http://localhost:6060/debug/pprof/goroutineleak'
 package main

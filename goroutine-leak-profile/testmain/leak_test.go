@@ -1,4 +1,4 @@
-// Run: GOEXPERIMENT=goroutineleakprofile go test ./testmain
+// Run: go test ./testmain
 package testmain
 
 import (
@@ -12,9 +12,6 @@ import (
 
 func leaked() (string, bool) {
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		return "", false // experiment off, nothing to detect
-	}
 	var b bytes.Buffer
 	p.WriteTo(&b, 1)
 	return b.String(), p.Count() > 0

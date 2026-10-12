@@ -1,7 +1,7 @@
 // manual-channel-drain shows why fixed receives return but ranging over an
 // unclosed channel does not.
 //
-// Run: GOEXPERIMENT=goroutineleakprofile go run ./manual-channel-drain
+// Run: go run ./manual-channel-drain
 package main
 
 import (
@@ -41,10 +41,6 @@ func rangeNoClose() {
 
 func main() {
 	p := pprof.Lookup("goroutineleak")
-	if p == nil {
-		fmt.Fprintln(os.Stderr, "no goroutineleak profile: rerun with GOEXPERIMENT=goroutineleakprofile")
-		os.Exit(1)
-	}
 
 	explicitReceive()
 	runtime.Gosched()

@@ -329,9 +329,6 @@ func TestBackgroundRecoversPanicFromHandler(t *testing.T) {
 
 func TestBackgroundDoesNotLeak(t *testing.T) {
 	profile := pprof.Lookup("goroutineleak")
-	if profile == nil {
-		t.Skip("goroutine leak profile requires Go 1.27 or GOEXPERIMENT=goroutineleakprofile")
-	}
 
 	background := New(1, 1, nil)
 	mustSubmit(t, background, func() {})

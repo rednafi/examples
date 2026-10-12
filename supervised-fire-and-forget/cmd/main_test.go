@@ -136,10 +136,6 @@ func assertNoGoroutineLeaks(t *testing.T) {
 	t.Helper()
 
 	profile := pprof.Lookup("goroutineleak")
-	if profile == nil {
-		t.Log("goroutine leak profile requires Go 1.27 or GOEXPERIMENT=goroutineleakprofile")
-		return
-	}
 
 	runtime.Gosched()
 	// WriteTo runs the leak detection pass; Count is only meaningful after it.
