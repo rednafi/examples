@@ -3,7 +3,7 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"log"
 	"net/http"
 	"strings"
@@ -43,7 +43,7 @@ func (s *Server) patchUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var in User
-	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+	if err := json.UnmarshalRead(r.Body, &in); err != nil {
 		http.Error(w, "invalid JSON body", http.StatusBadRequest)
 		return
 	}
@@ -72,7 +72,7 @@ func (s *Server) patchUser(w http.ResponseWriter, r *http.Request) {
 	s.users[u.ID] = u
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(u)
+	json.MarshalWrite(w, u)
 }
 
 func main() {

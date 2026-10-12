@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -41,7 +41,8 @@ func TestPatchUser(t *testing.T) {
 			srv := httptest.NewServer(s.Handler())
 			defer srv.Close()
 
-			req, err := http.NewRequest(
+			req, err := http.NewRequestWithContext(
+				t.Context(),
 				http.MethodPatch,
 				srv.URL+"/users/1?update_mask="+tt.mask,
 				strings.NewReader(tt.body),
@@ -59,7 +60,7 @@ func TestPatchUser(t *testing.T) {
 				t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusOK)
 			}
 			var got User
-			if err := json.NewDecoder(resp.Body).Decode(&got); err != nil {
+			if err := json.UnmarshalRead(resp.Body, &got); err != nil {
 				t.Fatal(err)
 			}
 			if got != tt.want {

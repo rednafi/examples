@@ -13,5 +13,6 @@ go test -race ./...
 go run .
 curl -X PATCH 'http://127.0.0.1:8080/users/1?update_mask=name' -d '{"name": "Bob"}'
 curl -X PATCH 'http://127.0.0.1:8080/users/1?update_mask=address' -d '{"address": "New Street 2"}'
+curl -X PATCH 'http://127.0.0.1:8080/users/1?update_mask=address' -d '{"address": null}'
 curl -X PATCH 'http://127.0.0.1:8080/users/1?update_mask=address' -d '{}'
 ```
